@@ -7,7 +7,7 @@ Compiler Compiler Combinator，随平台更名）的 JVM 移植版：一个 Pars
 Kotlin 编写，零第三方运行时依赖。
 
 - 原理：字符级扫描（一个 Token = 一个字符），`.grammar` 语法文件由手写的
-  `NcGrammerParser`（bootstrap 解析器）解析为 AST，再由 `NcParser` 解释成解析器树。
+  `NcGrammarParser`（bootstrap 解析器）解析为 AST，再由 `NcParser` 解释成解析器树。
 - 自举：`kccc/kccc.grammar`（资源文件）描述了语法文件本身的语法，因此 Kccc 可以
   解析自己的语法描述（见 `BootstrappingTests`：手写解析器 → 一级解释 → 二级 P2P
   生成，三份解析结果 SExp 输出要求 **diff 为零**）。
@@ -48,7 +48,7 @@ io.github.skabyy.kccc
 └── parser          IParser / ParseFunction / ParseStack / FakeParseStack /
                     MemorizedParser（packrat 记忆化）/ ParserImpl（左递归检测）/
                     ParseResult / Node / CombinedParser（P*/C* 组合子）/
-                    NcGrammerParser（手写 bootstrap 文法）/ NcParser（文法解释器）
+                    NcGrammarParser（手写 bootstrap 文法）/ NcParser（文法解释器）
 ```
 
 - `CombinedParser`：内建字符解析器（`pEof`/`pAlpha`/`pDigit`/`pSpace`/`pNewline`/
@@ -78,8 +78,10 @@ root = (@+ alpha) \eof
 1. **`TextPosition.back()` 补上 throw**：原 C# 代码构造了
    `InvalidOperationException` 但忘了 `throw`（`new InvalidOperationException(...)`
    语句无效果）。移植版恢复本意：`offset == 0` 时抛出 `IllegalStateException`。
-2. **`.grammer` → `.grammar`**：原版文件扩展名拼写错误（grammer），全部资源、
-   路径、文档统一改为 `grammar`。
+2. **拼写修正 `grammer` → `grammar`**：原版的 `grammer` 拼写错误贯穿扩展名与
+   标识符——文件扩展名 `.grammer`、类名 `NcGrammerParser`、方法
+   `GetNcGrammerSource`——移植版全部修正为 `.grammar`、`NcGrammarParser`、
+   `getNcGrammarSource`。
 3. **`sample.json` 为移植版补写**：原仓库 `Nccc.Tests.csproj` 声明了内嵌资源
    `Nccc.Tests.Json.sample.json`，但该文件从未被提交，原 `JsonTests.TestSample`
    在 .NET 上也无法通过。移植版按 json.grammar 编写了一份覆盖全部产生式的
@@ -100,9 +102,9 @@ root = (@+ alpha) \eof
 9. **线程安全**：与原版一致，`MemorizedParser` 的记忆表按偏移缓存、不区分解析
    栈，**解析器实例非线程安全**（每次 parse 前会清空缓存）。
 10. **项目改名 Nccc → Kccc**：原名的 N 指 .Net，随平台更名。类名
-    （`NcParser`/`NcGrammerParser`）保留——"Nc" 视为语法语言本身的名字，属继承物；
-    引导文法资源路径由 `nccc/nccc.grammar` 改为 `kccc/kccc.grammar`
-    （文法文件格式与内容零改动）。
+    （`NcParser`/`NcGrammarParser`）保留 Nc 前缀——"Nc" 视为语法语言本身的名字，
+    属继承物（其中 `NcGrammarParser` 的拼写修正见第 2 条）；引导文法资源路径由
+    `nccc/nccc.grammar` 改为 `kccc/kccc.grammar`（文法文件格式与内容零改动）。
 
 其余实现——包括引用相等语义（`TokenStream.Equals` 中 Position 按引用比较、
 `ParseStack.Has` 中 parser 按引用比较、`CStar` 空匹配检测）——均按原版直译保留。

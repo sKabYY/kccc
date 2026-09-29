@@ -7,13 +7,13 @@ import org.junit.jupiter.api.Test
 
 class SamplesTests {
 
-    private fun parseAndPrint(grammer: String, source: String) {
-        val postProcessedGrammer = """
+    private fun parseAndPrint(grammar: String, source: String) {
+        val postProcessedGrammar = """
 ::root
 @include-builtin
 spacing = ~(@* \space)
-""" + grammer
-        val parser = NcParser.load(postProcessedGrammer)
+""" + grammar
+        val parser = NcParser.load(postProcessedGrammar)
         println("source: \"$source\"")
         val result = parser.parse(source)
         println(result.toSExp().toPrettyString())
@@ -22,76 +22,76 @@ spacing = ~(@* \space)
 
     @Test
     fun parseString() {
-        parseAndPrint(grammer = "root = 'A'", source = "A")
+        parseAndPrint(grammar = "root = 'A'", source = "A")
     }
 
     @Test
     fun parseSeq() {
-        parseAndPrint(grammer = "root = (@.. 'A' 'B')", source = "A B")
-        parseAndPrint(grammer = "root = ('A' 'B')", source = "A B")
-        parseAndPrint(grammer = "root = 'A' 'B'", source = "A B")
+        parseAndPrint(grammar = "root = (@.. 'A' 'B')", source = "A B")
+        parseAndPrint(grammar = "root = ('A' 'B')", source = "A B")
+        parseAndPrint(grammar = "root = 'A' 'B'", source = "A B")
     }
 
     @Test
     fun parseOr() {
-        val grammer = "root = (@or 'A' 'B')"
-        parseAndPrint(grammer = grammer, source = "A")
-        parseAndPrint(grammer = grammer, source = "B")
+        val grammar = "root = (@or 'A' 'B')"
+        parseAndPrint(grammar = grammar, source = "A")
+        parseAndPrint(grammar = grammar, source = "B")
     }
 
     @Test
     fun parseMaybe() {
-        val grammer = "root = (@? 'A')"
-        parseAndPrint(grammer = grammer, source = "")
-        parseAndPrint(grammer = grammer, source = "A")
+        val grammar = "root = (@? 'A')"
+        parseAndPrint(grammar = grammar, source = "")
+        parseAndPrint(grammar = grammar, source = "A")
     }
 
     @Test
     fun parseStar() {
-        val grammer = "root = (@* 'A')"
-        parseAndPrint(grammer = grammer, source = "")
-        parseAndPrint(grammer = grammer, source = "A A A A")
+        val grammar = "root = (@* 'A')"
+        parseAndPrint(grammar = grammar, source = "")
+        parseAndPrint(grammar = grammar, source = "A A A A")
     }
 
     @Test
     fun parseStarAOrB() {
-        val grammer = "root = (@* (@or 'A' 'B'))"
-        parseAndPrint(grammer = grammer, source = "B B")
-        parseAndPrint(grammer = grammer, source = "A A")
-        parseAndPrint(grammer = grammer, source = "A B")
-        parseAndPrint(grammer = grammer, source = "A B A A")
+        val grammar = "root = (@* (@or 'A' 'B'))"
+        parseAndPrint(grammar = grammar, source = "B B")
+        parseAndPrint(grammar = grammar, source = "A A")
+        parseAndPrint(grammar = grammar, source = "A B")
+        parseAndPrint(grammar = grammar, source = "A B A A")
     }
 
     @Test
     fun parseNumber() {
-        parseAndPrint(grammer = "root = number", source = "1.1")
+        parseAndPrint(grammar = "root = number", source = "1.1")
     }
 
     @Test
     fun parseNumberOrStringA() {
-        val grammer = "root = (@or number 'A')"
-        parseAndPrint(grammer = grammer, source = "1.1")
-        parseAndPrint(grammer = grammer, source = "A")
+        val grammar = "root = (@or number 'A')"
+        parseAndPrint(grammar = grammar, source = "1.1")
+        parseAndPrint(grammar = grammar, source = "A")
     }
 
     @Test
     fun parseStarNumberOrStringA() {
-        val grammer = "root = (@* (@or number #'A'))"
-        parseAndPrint(grammer = grammer, source = "1.1")
-        parseAndPrint(grammer = grammer, source = "A")
-        parseAndPrint(grammer = grammer, source = "A A")
-        parseAndPrint(grammer = grammer, source = "1.1 2")
-        parseAndPrint(grammer = grammer, source = "A 23")
-        parseAndPrint(grammer = grammer, source = "A 1.2 A A")
+        val grammar = "root = (@* (@or number #'A'))"
+        parseAndPrint(grammar = grammar, source = "1.1")
+        parseAndPrint(grammar = grammar, source = "A")
+        parseAndPrint(grammar = grammar, source = "A A")
+        parseAndPrint(grammar = grammar, source = "1.1 2")
+        parseAndPrint(grammar = grammar, source = "A 23")
+        parseAndPrint(grammar = grammar, source = "A 1.2 A A")
     }
 
-    private fun parseByAndPrint(grammer: String, parserName: String, source: String) {
-        val postProcessedGrammer = """
+    private fun parseByAndPrint(grammar: String, parserName: String, source: String) {
+        val postProcessedGrammar = """
 ::root
 @include-builtin
 spacing = ~(@* \space)
-""" + grammer
-        val parser = NcParser.load(postProcessedGrammer)
+""" + grammar
+        val parser = NcParser.load(postProcessedGrammar)
         println("source: \"$source\"")
         val result = parser.parseBy(parserName, source)
         println(result.toSExp().toPrettyString())
@@ -100,29 +100,29 @@ spacing = ~(@* \space)
 
     @Test
     fun parseBy() {
-        val grammer = """
+        val grammar = """
 root = header footer
 header = (@+ num:number)
 footer = (@+ var:(@+ alpha) spacing)
 """
-        parseAndPrint(grammer = grammer, source = "1.1 1.2 abc ef")
-        parseByAndPrint(grammer = grammer, parserName = "header", source = "1.1 1.2")
-        parseByAndPrint(grammer = grammer, parserName = "footer", source = "abc ef")
+        parseAndPrint(grammar = grammar, source = "1.1 1.2 abc ef")
+        parseByAndPrint(grammar = grammar, parserName = "header", source = "1.1 1.2")
+        parseByAndPrint(grammar = grammar, parserName = "footer", source = "abc ef")
     }
 
     @Test
     fun defaultSpacingShouldBeGlobbed() {
-        val grammer = """
+        val grammar = """
 root = header footer
 header = (@+ num:number)
 footer = (@+ var:(@+ alpha) spacing)
 """
-        val postProcessedGrammer = """
+        val postProcessedGrammar = """
 ::root
 @include-builtin
 spacing = ~(@* \space)
-""" + grammer
-        val parser = NcParser.load(postProcessedGrammer)
+""" + grammar
+        val parser = NcParser.load(postProcessedGrammar)
         val source = "1.1 1.2 abc ef"
         println("source: \"$source\"")
         val result = parser.parse(source)
@@ -133,15 +133,15 @@ spacing = ~(@* \space)
 
     @Test
     fun eofTests() {
-        val grammer = """
+        val grammar = """
 root = (@+ num:number)
 """
-        val postProcessedGrammer = """
+        val postProcessedGrammar = """
 ::root
 @include-builtin
 spacing = ~(@* \space)
-""" + grammer
-        val parser = NcParser.load(postProcessedGrammer)
+""" + grammar
+        val parser = NcParser.load(postProcessedGrammar)
         val source = "1.1 1.2 abc ef"
         println("source: \"$source\"")
         val result = parser.parse(source)

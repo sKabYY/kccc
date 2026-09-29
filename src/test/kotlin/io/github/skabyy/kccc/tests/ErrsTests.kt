@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 class ErrsTests {
 
     companion object {
-        const val grammer = """
+        const val grammar = """
 :: root
 
 @set-message-locale-start 'L{'
@@ -21,7 +21,7 @@ root = (@err'L{expect} A L{or} B' oo:(@or 'A' 'B'))
 
     @Test
     fun testMessageLocale() {
-        val parser = NcParser.load(grammer) { settings ->
+        val parser = NcParser.load(grammar) { settings ->
             settings.locale.language = "zh-cn"
             settings.locale.set(
                 "zh-cn", mapOf(

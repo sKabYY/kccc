@@ -2,7 +2,7 @@ package io.github.skabyy.kccc.parser
 
 import io.github.skabyy.kccc.common.ResourceUtils
 
-class NcGrammerParser : CombinedParser() {
+class NcGrammarParser : CombinedParser() {
 
     init {
         val space = pSpace()
@@ -150,11 +150,10 @@ class NcGrammerParser : CombinedParser() {
         const val PROGRAM = "program"
 
         /**
-         * Reads the bootstrapping grammar resource (the C# original read
-         * "Nccc.Bootstrapping.nccc.grammer" from the executing assembly).
+         * Reads the bootstrapping grammar resource.
          */
         @JvmStatic
-        fun getNcGrammerSource(): String {
+        fun getNcGrammarSource(): String {
             return ResourceUtils.readString("kccc/kccc.grammar")
         }
     }
