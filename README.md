@@ -6,10 +6,10 @@ Compiler Compiler Combinator，随平台更名）的 JVM 移植版：一个 Pars
 [Nccc](https://github.com/sKabYY/Nccc)（.NET 版 2.0.3）的 **1:1 直译**移植，使用
 Kotlin 编写，零第三方运行时依赖。
 
-- 原理：字符级扫描（一个 Token = 一个字符），`.grammar` 语法文件（语言名 yc）由
+- 原理：字符级扫描（一个 Token = 一个字符），`.grammar` 语法文件（语言名 yccc）由
   手写的 `YcGrammarParser`（bootstrap 解析器）解析为 AST，再由 `YcParser` 解释成
   解析器树。
-- 自举：`kccc/yc.grammar`（资源文件）描述了语法文件本身的语法，因此 Kccc 可以
+- 自举：`kccc/yccc.grammar`（资源文件）描述了语法文件本身的语法，因此 Kccc 可以
   解析自己的语法描述（见 `BootstrappingTests`：手写解析器 → 一级解释 → 二级 P2P
   生成，三份解析结果 SExp 输出要求 **diff 为零**）。
 
@@ -71,7 +71,7 @@ io.github.skabyy.kccc
 root = (@+ alpha) \eof
 ```
 
-详细语法见 `src/main/resources/kccc/yc.grammar` 自身（92 行，带注释），以及
+详细语法见 `src/main/resources/kccc/yccc.grammar` 自身（92 行，带注释），以及
 `src/test/resources/` 下的 calculator / json / lexMode / sql 文法与样例。
 
 ## 与原版的差异（除语言平台外，仅以下几处）
@@ -105,11 +105,12 @@ root = (@+ alpha) \eof
 10. **项目改名 Nccc → Kccc**：原名的 N 指 .Net，随平台更名；当时类名
     `NcParser`/`NcGrammarParser` 暂予保留（见第 11 条）；引导文法资源路径由
     `nccc/nccc.grammar` 改为 `kccc/kccc.grammar`（文法文件格式与内容零改动）。
-11. **类名 `Nc*` → `Yc*`，语法语言命名 `yc`**：类名前缀的 N 随 .Net，且
+11. **类名 `Nc*` → `Yc*`，语法语言命名 `yccc`**：类名前缀的 N 随 .Net，且
     "nc 语法"之名易被误读为绑定技术栈；改为作者标识前缀 **Yc**（Y = sKabYY），
-    语法语言正式命名 **yc**——技术栈中立，`.grammar` 为可移植格式。类名
-    `NcParser`/`NcGrammarParser` → `YcParser`/`YcGrammarParser`；meta 文法资源
-    `kccc/kccc.grammar` → `kccc/yc.grammar`（文法文件格式与内容零改动）。
+    语法语言正式命名 **yccc**（Y + ccc，与库名 Kccc 同构）——技术栈中立，
+    `.grammar` 为可移植格式。类名 `NcParser`/`NcGrammarParser` →
+    `YcParser`/`YcGrammarParser`；meta 文法资源 `kccc/kccc.grammar` →
+    `kccc/yccc.grammar`（文法文件格式与内容零改动）。
 
 其余实现——包括引用相等语义（`TokenStream.Equals` 中 Position 按引用比较、
 `ParseStack.Has` 中 parser 按引用比较、`CStar` 空匹配检测）——均按原版直译保留。

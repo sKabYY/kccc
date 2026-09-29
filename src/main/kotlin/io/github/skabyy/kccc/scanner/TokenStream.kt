@@ -2,26 +2,26 @@ package io.github.skabyy.kccc.scanner
 
 import io.github.skabyy.kccc.common.TextPosition
 
-class TokenStream(private val _scanner: CharScanner, val str: String, pos: TextPosition) {
+class TokenStream(private val scanner: CharScanner, val str: String, pos: TextPosition) {
 
-    private val _cur: Token = _scanner.scan1(str, pos)
+    private val cur: Token = scanner.scan1(str, pos)
 
     constructor(charScanner: CharScanner, str: String) : this(charScanner, str, TextPosition.startPos)
 
     fun car(): Token {
-        return _cur
+        return cur
     }
 
     fun cdr(): TokenStream {
-        return TokenStream(_scanner, str, _cur.end)
+        return TokenStream(scanner, str, cur.end)
     }
 
     fun isEndOfStream(): Boolean {
-        return _cur.isEof()
+        return cur.isEof()
     }
 
     fun position(): TextPosition {
-        return _cur.start
+        return cur.start
     }
 
     override fun toString(): String {
@@ -33,7 +33,7 @@ class TokenStream(private val _scanner: CharScanner, val str: String, pos: TextP
         // Mirrors the C# `Equals` override: the scanner is compared by
         // reference, the string by value, and the position by *reference*
         // (TextPosition never overrides Equals in the original either).
-        return _scanner === other._scanner && str == other.str && position() === other.position()
+        return scanner === other.scanner && str == other.str && position() === other.position()
     }
 
     override fun hashCode(): Int {
@@ -42,9 +42,9 @@ class TokenStream(private val _scanner: CharScanner, val str: String, pos: TextP
         // as a hash key; hashing by the stable offset keeps the general
         // contract without changing observable behavior.
         var hashCode = 1851490821
-        hashCode = hashCode * -1521134295 + System.identityHashCode(_scanner)
+        hashCode = hashCode * -1521134295 + System.identityHashCode(scanner)
         hashCode = hashCode * -1521134295 + str.hashCode()
-        hashCode = hashCode * -1521134295 + _cur.start.offset
+        hashCode = hashCode * -1521134295 + cur.start.offset
         return hashCode
     }
 }

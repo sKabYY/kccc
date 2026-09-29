@@ -3,6 +3,9 @@ package io.github.skabyy.kccc.scanner
 import io.github.skabyy.kccc.common.TextPosition
 import io.github.skabyy.kccc.exceptions.ReachEofException
 
+// NOTE: `_value` is the private backing field of the public `value` property
+// (Kotlin naming convention for public property + private implementation
+// detail); the underscore is intentional — do not rename.
 class Token private constructor(private val _value: Char?, val start: TextPosition) {
 
     val end: TextPosition = if (_value != null) start.shift(_value) else start

@@ -13,26 +13,26 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
      * NOTE: the C# Settings properties are write-only; Kotlin cannot express
      * a private getter on a public var, so these are read/write instead.
      */
-    class Settings internal constructor(private val _parser: YcParser) {
+    class Settings internal constructor(private val parser: YcParser) {
 
         val locale: Locale
-            get() = _parser.`_`
+            get() = parser.locale
 
         var caseSensitive: Boolean
-            get() = _parser.caseSensitive
-            set(value) { _parser.caseSensitive = value }
+            get() = parser.caseSensitive
+            set(value) { parser.caseSensitive = value }
 
         var splitWord: Boolean
-            get() = _parser.splitWord
-            set(value) { _parser.splitWord = value }
+            get() = parser.splitWord
+            set(value) { parser.splitWord = value }
 
         var leftRecurDetection: Boolean
-            get() = _parser.leftRecurDetection
-            set(value) { _parser.leftRecurDetection = value }
+            get() = parser.leftRecurDetection
+            set(value) { parser.leftRecurDetection = value }
 
         var useMemorizedParser: Boolean
-            get() = _parser.useMemorizedParser
-            set(value) { _parser.useMemorizedParser = value }
+            get() = parser.useMemorizedParser
+            set(value) { parser.useMemorizedParser = value }
     }
 
     init {

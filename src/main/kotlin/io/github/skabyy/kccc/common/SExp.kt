@@ -30,20 +30,20 @@ private fun ensureSExp(obj: Any?): SExp {
 
 class ListSExp(vararg os: Any?) : SExp() {
 
-    private val _sexps: MutableList<SExp> = os.map { ensureSExp(it) }.toMutableList()
+    private val sexps: MutableList<SExp> = os.map { ensureSExp(it) }.toMutableList()
 
     fun push(vararg os: Any?) {
         for (o in os) {
-            _sexps.add(ensureSExp(o))
+            sexps.add(ensureSExp(o))
         }
     }
 
     fun pushFront(o: Any?) {
-        _sexps.add(0, ensureSExp(o))
+        sexps.add(0, ensureSExp(o))
     }
 
     fun append(e: ListSExp) {
-        _sexps.addAll(e._sexps)
+        sexps.addAll(e.sexps)
     }
 
     override fun toPrettyString(firstOfList: Boolean, indent: Int): String {
@@ -53,14 +53,14 @@ class ListSExp(vararg os: Any?) : SExp() {
             sb.append(" ".repeat(indent))
         }
         sb.append('(')
-        if (_sexps.isNotEmpty()) {
+        if (sexps.isNotEmpty()) {
             val newIndent = indent + 1
-            val first = _sexps.first().toPrettyString(true, newIndent)
+            val first = sexps.first().toPrettyString(true, newIndent)
             sb.append(first)
-            if (_sexps.all { it is ValueSExp }) {
+            if (sexps.all { it is ValueSExp }) {
                 val maxLineLength = 80
                 var curLength = first.length
-                for (sexp in _sexps.drop(1)) {
+                for (sexp in sexps.drop(1)) {
                     if (curLength < maxLineLength) {
                         val str = sexp.toPrettyString(true, newIndent)
                         sb.append(' ')
@@ -74,7 +74,7 @@ class ListSExp(vararg os: Any?) : SExp() {
                     }
                 }
             } else {
-                for (sexp in _sexps.drop(1)) {
+                for (sexp in sexps.drop(1)) {
                     sb.append('\n')
                     sb.append(sexp.toPrettyString(false, newIndent))
                 }
@@ -85,11 +85,11 @@ class ListSExp(vararg os: Any?) : SExp() {
     }
 }
 
-class ValueSExp(private val _value: Any?) : SExp() {
+class ValueSExp(private val value: Any?) : SExp() {
 
     override fun toPrettyString(firstOfList: Boolean, indent: Int): String {
-        var s = _value?.toString() ?: "<null>"
-        if (_value is String && s.any { it.isWhitespace() }) {
+        var s = value?.toString() ?: "<null>"
+        if (value is String && s.any { it.isWhitespace() }) {
             s = "\"" + s.replace("\"", "\\\"") + "\""
         }
         if (firstOfList || indent == 0) return s

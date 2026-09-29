@@ -39,12 +39,12 @@ root = (@err'L{expect} A L{or} B' oo:(@or 'A' 'B'))
 
     @Test
     fun testCIfFail() {
-        val grmr = """
+        val grammarSrc = """
 ::root
 @include-builtin
 root = (@+ alpha) \eof
 """
-        val parser = YcParser.load(grmr)
+        val parser = YcParser.load(grammarSrc)
         val result = parser.parse("a1")
         println(result.toSExp().toPrettyString())
         assertFalse(result.isSuccess())

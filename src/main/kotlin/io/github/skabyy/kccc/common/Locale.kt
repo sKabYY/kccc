@@ -5,17 +5,17 @@ class Locale {
     var language: String? = null
 
     fun l(s: String): String {
-        tryGetFromLocales(_locales, s)?.let { return it }
+        tryGetFromLocales(locales, s)?.let { return it }
         tryGetFromLocales(globalLocales, s)?.let { return it }
         return s
     }
 
     fun set(lang: String, entries: Map<String, String>) {
-        val dict = _locales[lang]
+        val dict = locales[lang]
         if (dict != null) {
             dict.putAll(entries)
         } else {
-            _locales[lang] = HashMap(entries)
+            locales[lang] = HashMap(entries)
         }
     }
 
@@ -25,7 +25,7 @@ class Locale {
         return dict[s]
     }
 
-    private val _locales = HashMap<String, MutableMap<String, String>>()
+    private val locales = HashMap<String, MutableMap<String, String>>()
 
     companion object {
         private val globalLocales: Map<String, Map<String, String>> = mapOf(

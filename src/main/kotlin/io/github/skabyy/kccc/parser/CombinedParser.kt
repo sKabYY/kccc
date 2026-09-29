@@ -10,7 +10,7 @@ import java.util.regex.Pattern
 
 open class CombinedParser protected constructor() {
 
-    protected val `_`: Locale = Locale()
+    protected val locale: Locale = Locale()
     protected val scanner: CharScanner = CharScanner()
 
     protected var leftRecurDetection: Boolean = true
@@ -21,7 +21,7 @@ open class CombinedParser protected constructor() {
     protected var spacingParser: IParser? = null
 
     private var rootParser: IParser? = null
-    private val _env = HashMap<String, IParser>()
+    private val env = HashMap<String, IParser>()
 
     protected fun setRootParser(parser: IParser) {
         rootParser = parser
@@ -46,16 +46,16 @@ open class CombinedParser protected constructor() {
         return cSeq(pSpacing(), parser, pEof())
     }
 
-    private val _memorizedParsers = ArrayList<MemorizedParser>()
+    private val memorizedParsers = ArrayList<MemorizedParser>()
 
     private fun makeMemorizedParser(parser: IParser): MemorizedParser {
         val memorizedParser = MemorizedParser(parser)
-        _memorizedParsers.add(memorizedParser)
+        memorizedParsers.add(memorizedParser)
         return memorizedParser
     }
 
     private fun resetMemorizedParsers() {
-        for (p in _memorizedParsers) {
+        for (p in memorizedParsers) {
             p.clear()
         }
     }
@@ -82,7 +82,7 @@ open class CombinedParser protected constructor() {
     }
 
     protected fun pAlpha(): IParser {
-        return cIfFail("${`_`.l("expect")} alpha", cOr(pRange('a', 'z'), pRange('A', 'Z')))
+        return cIfFail("${locale.l("expect")} alpha", cOr(pRange('a', 'z'), pRange('A', 'Z')))
     }
 
     protected fun pDigit(): IParser {
@@ -90,7 +90,7 @@ open class CombinedParser protected constructor() {
     }
 
     protected fun pSpace(): IParser {
-        return pTokenPred("${`_`.l("expect")} whitespace") { tok -> tok.value.isWhitespace() }
+        return pTokenPred("${locale.l("expect")} whitespace") { tok -> tok.value.isWhitespace() }
     }
 
     protected fun pNewline(): IParser {
@@ -137,7 +137,7 @@ open class CombinedParser protected constructor() {
     }
 
     protected fun pChar(c: Char, caseSensitive: Boolean = true): IParser {
-        return pTokenPred("${`_`.l("expect")} \"$c\"") { tok ->
+        return pTokenPred("${locale.l("expect")} \"$c\"") { tok ->
             if (caseSensitive) {
                 tok.value == c
             } else {
@@ -147,7 +147,7 @@ open class CombinedParser protected constructor() {
     }
 
     protected fun pCharArray(s: String, caseSensitive: Boolean = true): IParser {
-        return cIfFail("${`_`.l("expect")} \"$s\"", cSeq(*s.map { pChar(it, caseSensitive) }.toTypedArray()))
+        return cIfFail("${locale.l("expect")} \"$s\"", cSeq(*s.map { pChar(it, caseSensitive) }.toTypedArray()))
     }
 
     protected fun pRange(c1: Char, c2: Char): IParser {
@@ -164,7 +164,7 @@ open class CombinedParser protected constructor() {
     protected fun pAny(): IParser {
         return ParserImpl { toks, _ ->
             if (toks.isEndOfStream()) {
-                outputFail("ANY fail: ${`_`.l("reach eof")}", toks)
+                outputFail("ANY fail: ${locale.l("reach eof")}", toks)
             } else {
                 outputNode(Node.makeLeaf(toks.car()), toks.cdr())
             }
@@ -344,15 +344,15 @@ open class CombinedParser protected constructor() {
     }
 
     private fun envGet(name: String): IParser {
-        val p = _env[name]
+        val p = env[name]
         if (p != null) {
             return p
         }
-        throw ParseException("\"$name\" ${`_`.l("is undefined")}")
+        throw ParseException("\"$name\" ${locale.l("is undefined")}")
     }
 
     private fun envSet(name: String, p: IParser) {
-        _env[name] = p
+        env[name] = p
     }
 
     private fun outputNodes(
@@ -432,7 +432,7 @@ open class CombinedParser protected constructor() {
             // takes a *length* as second argument; Kotlin's substring takes an
             // end index, hence `item.length - end.length`.
             val key = item.substring(start.length, item.length - end.length)
-            result = result.replace(item, `_`.l(key))
+            result = result.replace(item, locale.l(key))
         }
         return result
     }
