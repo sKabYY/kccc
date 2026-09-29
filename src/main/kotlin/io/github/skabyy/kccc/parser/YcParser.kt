@@ -18,21 +18,10 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
         val locale: Locale
             get() = parser.locale
 
-        var caseSensitive: Boolean
-            get() = parser.caseSensitive
-            set(value) { parser.caseSensitive = value }
-
-        var splitWord: Boolean
-            get() = parser.splitWord
-            set(value) { parser.splitWord = value }
-
-        var leftRecurDetection: Boolean
-            get() = parser.leftRecurDetection
-            set(value) { parser.leftRecurDetection = value }
-
-        var useMemorizedParser: Boolean
-            get() = parser.useMemorizedParser
-            set(value) { parser.useMemorizedParser = value }
+        var caseSensitive: Boolean by parser::caseSensitive
+        var splitWord: Boolean by parser::splitWord
+        var leftRecurDetection: Boolean by parser::leftRecurDetection
+        var useMemorizedParser: Boolean by parser::useMemorizedParser
     }
 
     private fun internalChildren(node: Node, what: String): List<Node> {
@@ -77,7 +66,7 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
     }
 
     private fun setOption(cmd: Node, args: List<Node>) {
-        cmd.match<Unit> { type ->
+        cmd.match { type ->
             type(YcGrammarParser.CASE_SENSITIVE) { _ ->
                 caseSensitive = valueOfOnOrOff(args.first())
             }
@@ -165,15 +154,15 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
 
     private fun valueOfWordExp(es: List<Node>): IParser {
         val word = Node.concatValue(es)
-        if (!word.isBlank() && splitWord) {
+        return if (!word.isBlank() && splitWord) {
             // C# `word.Split()` splits on runs of whitespace and drops empty
             // entries; the filter reproduces that after a regex split.
-            return cSeq(*word.split(Regex("\\s+"))
+            cSeq(*word.split(Regex("\\s+"))
                 .filter { it.isNotEmpty() }
                 .map { pEqAndRetain(it, caseSensitive) }
                 .toTypedArray())
         } else {
-            return pEqAndRetain(word, caseSensitive)
+            pEqAndRetain(word, caseSensitive)
         }
     }
 
