@@ -1,0 +1,10 @@
+{
+  "name": "nccc",
+  "version": 2.0,
+  "numbers": [1, 2.5, -3, 1e10],
+  "flags": [true, false, null],
+  "nested": {"a": {"b": [1, [2, 3]]}},
+  "empty_string": "",
+  "empty_object": {},
+  "empty_array": []
+}

@@ -1,0 +1,7 @@
+.gradle/
+build/
+.kotlin/
+.idea/
+.tools/
+.tls-test/
+*.log
