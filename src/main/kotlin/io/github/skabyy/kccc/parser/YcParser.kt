@@ -35,6 +35,13 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
             set(value) { parser.useMemorizedParser = value }
     }
 
+    private fun internalChildren(node: Node, what: String): MutableList<Node> {
+        return when (node) {
+            is Node.Internal -> node.children
+            is Node.Leaf -> throw ParseException("$what must be a node")
+        }
+    }
+
     init {
         // default options
         caseSensitive = true
@@ -44,10 +51,10 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
         spacingParser = cGlob(cStar(pSpace()))
         // ===============
 
-        val nodes = requireNotNull(grammarAst.children) { "grammar AST node without children" }
+        val nodes = internalChildren(grammarAst, "grammar AST root")
         val rootStm = nodes.first()
-        val optionStms = requireNotNull(nodes[1].children) { "grammar AST option-section without children" }
-        val defStms = requireNotNull(nodes[2].children) { "grammar AST def-section without children" }
+        val optionStms = internalChildren(nodes[1], "grammar AST option-section")
+        val defStms = internalChildren(nodes[2], "grammar AST def-section")
         val rootName = rootStm.stringValue()
 
         Node.match(optionStms) { type ->
@@ -137,7 +144,7 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
         return node.match { type ->
             type(YcGrammarParser.NORMAL_CHAR) { es ->
                 if (es.size == 1) {
-                    pChar(es.first().value)
+                    pChar((es.first() as Node.Leaf).value)
                 } else {
                     throw ParseException("not a char (${nodePosition(es.first())})")
                 }

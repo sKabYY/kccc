@@ -14,20 +14,25 @@ internal fun nodePosition(node: Node): String {
     return node.start?.let { "row ${it.linenum} column ${it.colnum}" } ?: "unknown position"
 }
 
-class Node {
+/**
+ * Parse-tree node, sealed into [Leaf] (a single token's char value) and
+ * [Internal] (a typed node with children) so the two shapes are distinguished
+ * by the type system instead of a nullable `children` flag. Both shapes are
+ * immutable after construction: [Leaf] always carries a position, [Internal]
+ * keeps a nullable type/start/end (the internal dig-wrapper nodes carry none).
+ */
+sealed class Node {
 
-    var type: String? = null
-    var value: Char = '\u0000'
-    var children: MutableList<Node>? = null
-    var start: TextPosition? = null
-    var end: TextPosition? = null
+    abstract val type: String?
+    abstract val start: TextPosition?
+    abstract val end: TextPosition?
 
     fun isLeaf(): Boolean {
-        return children == null
+        return this is Leaf
     }
 
     fun isStringNode(): Boolean {
-        return children?.all { it.isLeaf() } == true
+        return this is Internal && children.all { it is Leaf }
     }
 
     /**
@@ -35,9 +40,8 @@ class Node {
      * a string node (replacement for the C# `TryGetStringValue(out ...)`).
      */
     fun tryGetStringValue(): String? {
-        val c = children
-        if (c != null && c.all { it.isLeaf() }) {
-            return nodesToString(c)
+        if (this is Internal && children.all { it is Leaf }) {
+            return nodesToString(children)
         }
         return null
     }
@@ -51,18 +55,23 @@ class Node {
     }
 
     fun toSExp(): SExp {
-        val c = children ?: return SExp.value(value)
-        val strValue = tryGetStringValue()
-        if (strValue != null) {
-            val lst = SExp.list(getNodeMeta())
-            if (strValue.isNotEmpty()) {
-                lst.push(strValue)
+        return when (this) {
+            is Leaf -> SExp.value(value)
+            is Internal -> {
+                val strValue = tryGetStringValue()
+                if (strValue != null) {
+                    val lst = SExp.list(getNodeMeta())
+                    if (strValue.isNotEmpty()) {
+                        lst.push(strValue)
+                    }
+                    lst
+                } else {
+                    val lst = SExp.list(*children.map { it.toSExp() }.toTypedArray())
+                    lst.pushFront(getNodeMeta())
+                    lst
+                }
             }
-            return lst
         }
-        val lst = SExp.list(*c.map { it.toSExp() }.toTypedArray())
-        lst.pushFront(getNodeMeta())
-        return lst
     }
 
     override fun toString(): String {
@@ -83,8 +92,8 @@ class Node {
         var value: Any? = null
         var hit = false
         block { type, proc ->
-            if (this.type == type) {
-                value = proc(requireNotNull(children) { "type match on node without children" })
+            if (this.type == type && this is Internal) {
+                value = proc(children)
                 hit = true
             }
         }
@@ -103,7 +112,10 @@ class Node {
     ): T {
         var node = this
         for (i in path.indices) {
-            val c = node.children ?: return notFound(path[i], node)
+            val c = when (node) {
+                is Internal -> node.children
+                is Leaf -> return notFound(path[i], node)
+            }
             val found = c.filter { it.type == path[i] }
             when (found.size) {
                 0 -> return notFound(path[i], node)
@@ -150,11 +162,26 @@ class Node {
         return tryDigNode(*path)?.stringValue()
     }
 
+    class Leaf(
+        val value: Char,
+        override val start: TextPosition,
+        override val end: TextPosition
+    ) : Node() {
+        override val type: String? = null
+    }
+
+    class Internal(
+        override val type: String?,
+        val children: MutableList<Node>,
+        override val start: TextPosition?,
+        override val end: TextPosition?
+    ) : Node()
+
     companion object {
 
         @JvmStatic
         fun concatValue(nodes: MutableList<Node>): String {
-            val node = nodes.firstOrNull { !it.isLeaf() }
+            val node = nodes.firstOrNull { it !is Leaf }
             if (node != null) {
                 throw NodeMethodException(node, "expect a leaf but got ${node.toSExp().toPrettyString()} at ${nodePosition(node)}")
             }
@@ -162,22 +189,13 @@ class Node {
         }
 
         @JvmStatic
-        fun makeLeaf(tok: Token): Node {
-            val node = Node()
-            node.value = tok.value
-            node.start = tok.start
-            node.end = tok.end
-            return node
+        fun makeLeaf(tok: Token): Leaf {
+            return Leaf(tok.value, tok.start, tok.end)
         }
 
         @JvmStatic
-        fun makeNode(type: String?, children: MutableList<Node>?, start: TextPosition?, end: TextPosition?): Node {
-            val node = Node()
-            node.type = type
-            node.children = children
-            node.start = start
-            node.end = end
-            return node
+        fun makeNode(type: String?, children: MutableList<Node>?, start: TextPosition?, end: TextPosition?): Internal {
+            return Internal(type, children ?: mutableListOf(), start, end)
         }
 
         @JvmStatic
@@ -189,34 +207,26 @@ class Node {
 
         @JvmStatic
         fun digNode(nodes: MutableList<Node>, vararg path: String): Node {
-            val node = Node()
-            node.children = nodes
-            return node.digNode(*path)
+            return Internal(null, nodes, null, null).digNode(*path)
         }
 
         @JvmStatic
         fun tryDigNode(nodes: MutableList<Node>, vararg path: String): Node? {
-            val node = Node()
-            node.children = nodes
-            return node.tryDigNode(*path)
+            return Internal(null, nodes, null, null).tryDigNode(*path)
         }
 
         @JvmStatic
         fun digNodeOrNull(nodes: MutableList<Node>, vararg path: String): Node? {
-            val node = Node()
-            node.children = nodes
-            return node.digNodeOrNull(*path)
+            return Internal(null, nodes, null, null).digNodeOrNull(*path)
         }
 
         @JvmStatic
         fun digValue(nodes: MutableList<Node>, vararg path: String): String {
-            val node = Node()
-            node.children = nodes
-            return node.digValue(*path)
+            return Internal(null, nodes, null, null).digValue(*path)
         }
 
         private fun nodesToString(nodes: MutableList<Node>): String {
-            return String(nodes.map { it.value }.toCharArray())
+            return String(nodes.map { (it as Leaf).value }.toCharArray())
         }
     }
 }
