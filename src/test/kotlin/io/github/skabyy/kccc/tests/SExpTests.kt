@@ -1,7 +1,7 @@
 package io.github.skabyy.kccc.tests
 
-import io.github.skabyy.kccc.parser.NcGrammarParser
-import io.github.skabyy.kccc.parser.NcParser
+import io.github.skabyy.kccc.parser.YcGrammarParser
+import io.github.skabyy.kccc.parser.YcParser
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -26,7 +26,7 @@ spacing = ~(@* \space)
 
     @Test
     fun testNcPGP() {
-        val parser = NcGrammarParser()
+        val parser = YcGrammarParser()
         val parseResult = parser.parse(grammar)
         println(parseResult.toSExp().toPrettyString())
         assertTrue(parseResult.isSuccess())
@@ -34,7 +34,7 @@ spacing = ~(@* \space)
 
     @Test
     fun testParse() {
-        val parser = NcParser.load(grammar)
+        val parser = YcParser.load(grammar)
         val sexpCode = """
 (define (double x) (+ x x))
 (define (gcd a b) (if (= a 0) b (gcd (remainder b a) a)))

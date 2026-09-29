@@ -1,6 +1,6 @@
 package io.github.skabyy.kccc.tests
 
-import io.github.skabyy.kccc.parser.NcParser
+import io.github.skabyy.kccc.parser.YcParser
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -13,7 +13,7 @@ class SamplesTests {
 @include-builtin
 spacing = ~(@* \space)
 """ + grammar
-        val parser = NcParser.load(postProcessedGrammar)
+        val parser = YcParser.load(postProcessedGrammar)
         println("source: \"$source\"")
         val result = parser.parse(source)
         println(result.toSExp().toPrettyString())
@@ -91,7 +91,7 @@ spacing = ~(@* \space)
 @include-builtin
 spacing = ~(@* \space)
 """ + grammar
-        val parser = NcParser.load(postProcessedGrammar)
+        val parser = YcParser.load(postProcessedGrammar)
         println("source: \"$source\"")
         val result = parser.parseBy(parserName, source)
         println(result.toSExp().toPrettyString())
@@ -122,7 +122,7 @@ footer = (@+ var:(@+ alpha) spacing)
 @include-builtin
 spacing = ~(@* \space)
 """ + grammar
-        val parser = NcParser.load(postProcessedGrammar)
+        val parser = YcParser.load(postProcessedGrammar)
         val source = "1.1 1.2 abc ef"
         println("source: \"$source\"")
         val result = parser.parse(source)
@@ -141,7 +141,7 @@ root = (@+ num:number)
 @include-builtin
 spacing = ~(@* \space)
 """ + grammar
-        val parser = NcParser.load(postProcessedGrammar)
+        val parser = YcParser.load(postProcessedGrammar)
         val source = "1.1 1.2 abc ef"
         println("source: \"$source\"")
         val result = parser.parse(source)

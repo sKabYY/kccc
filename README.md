@@ -6,9 +6,10 @@ Compiler Compiler Combinator，随平台更名）的 JVM 移植版：一个 Pars
 [Nccc](https://github.com/sKabYY/Nccc)（.NET 版 2.0.3）的 **1:1 直译**移植，使用
 Kotlin 编写，零第三方运行时依赖。
 
-- 原理：字符级扫描（一个 Token = 一个字符），`.grammar` 语法文件由手写的
-  `NcGrammarParser`（bootstrap 解析器）解析为 AST，再由 `NcParser` 解释成解析器树。
-- 自举：`kccc/kccc.grammar`（资源文件）描述了语法文件本身的语法，因此 Kccc 可以
+- 原理：字符级扫描（一个 Token = 一个字符），`.grammar` 语法文件（语言名 yc）由
+  手写的 `YcGrammarParser`（bootstrap 解析器）解析为 AST，再由 `YcParser` 解释成
+  解析器树。
+- 自举：`kccc/yc.grammar`（资源文件）描述了语法文件本身的语法，因此 Kccc 可以
   解析自己的语法描述（见 `BootstrappingTests`：手写解析器 → 一级解释 → 二级 P2P
   生成，三份解析结果 SExp 输出要求 **diff 为零**）。
 
@@ -48,16 +49,16 @@ io.github.skabyy.kccc
 └── parser          IParser / ParseFunction / ParseStack / FakeParseStack /
                     MemorizedParser（packrat 记忆化）/ ParserImpl（左递归检测）/
                     ParseResult / Node / CombinedParser（P*/C* 组合子）/
-                    NcGrammarParser（手写 bootstrap 文法）/ NcParser（文法解释器）
+                    YcGrammarParser（手写 bootstrap 文法）/ YcParser（文法解释器）
 ```
 
 - `CombinedParser`：内建字符解析器（`pEof`/`pAlpha`/`pDigit`/`pSpace`/`pNewline`/
   `pNumber`…）、token 解析器（`pEq`/`pEqAndRetain`…）与组合子
   （`cOr`/`cSeq`/`cStar`/`cPlus`/`cJoin`/`cNot`/`cIs`/`cGlob`/`cArray`…）。
-- `NcParser.Settings`：`locale`、`caseSensitive`、`splitWord`、
+- `YcParser.Settings`：`locale`、`caseSensitive`、`splitWord`、
   `leftRecurDetection`、`useMemorizedParser`。
-- 加载文法：`NcParser.load(grammarSource) { settings -> ... }` 或
-  `NcParser.loadFromResource("path/in/classpath")`（对应原版的
+- 加载文法：`YcParser.load(grammarSource) { settings -> ... }` 或
+  `YcParser.loadFromResource("path/in/classpath")`（对应原版的
   `LoadFromAssembly`）。
 
 ## 语法文件示例
@@ -70,7 +71,7 @@ io.github.skabyy.kccc
 root = (@+ alpha) \eof
 ```
 
-详细语法见 `src/main/resources/kccc/kccc.grammar` 自身（92 行，带注释），以及
+详细语法见 `src/main/resources/kccc/yc.grammar` 自身（92 行，带注释），以及
 `src/test/resources/` 下的 calculator / json / lexMode / sql 文法与样例。
 
 ## 与原版的差异（除语言平台外，仅以下几处）
@@ -80,13 +81,13 @@ root = (@+ alpha) \eof
    语句无效果）。移植版恢复本意：`offset == 0` 时抛出 `IllegalStateException`。
 2. **拼写修正 `grammer` → `grammar`**：原版的 `grammer` 拼写错误贯穿扩展名与
    标识符——文件扩展名 `.grammer`、类名 `NcGrammerParser`、方法
-   `GetNcGrammerSource`——移植版全部修正为 `.grammar`、`NcGrammarParser`、
-   `getNcGrammarSource`。
+   `GetNcGrammerSource`——移植版全部修正为 `.grammar`、`YcGrammarParser`、
+   `getYcGrammarSource`。
 3. **`sample.json` 为移植版补写**：原仓库 `Nccc.Tests.csproj` 声明了内嵌资源
    `Nccc.Tests.Json.sample.json`，但该文件从未被提交，原 `JsonTests.TestSample`
    在 .NET 上也无法通过。移植版按 json.grammar 编写了一份覆盖全部产生式的
    样例（对象/数组/字符串/数字/布尔/null/嵌套/空容器）。
-4. **`NcParser.Settings` 属性**：原版为只写属性（write-only）；Kotlin 无法表达
+4. **`YcParser.Settings` 属性**：原版为只写属性（write-only）；Kotlin 无法表达
    公开 var + 私有 getter，改为可读写（行为超集，不影响测试）。
 5. **`TokenStream.hashCode()`**：原版把 `_cur`（Token 引用）混入哈希，与其自定义
    `Equals`（scanner 引用 + 字符串值 + 位置引用）不一致；移植版改用稳定 offset。
@@ -101,10 +102,14 @@ root = (@+ alpha) \eof
    行 diff 替代（控制台着色简化为 `+ `/`- ` 前缀），断言语义不变。
 9. **线程安全**：与原版一致，`MemorizedParser` 的记忆表按偏移缓存、不区分解析
    栈，**解析器实例非线程安全**（每次 parse 前会清空缓存）。
-10. **项目改名 Nccc → Kccc**：原名的 N 指 .Net，随平台更名。类名
-    （`NcParser`/`NcGrammarParser`）保留 Nc 前缀——"Nc" 视为语法语言本身的名字，
-    属继承物（其中 `NcGrammarParser` 的拼写修正见第 2 条）；引导文法资源路径由
+10. **项目改名 Nccc → Kccc**：原名的 N 指 .Net，随平台更名；当时类名
+    `NcParser`/`NcGrammarParser` 暂予保留（见第 11 条）；引导文法资源路径由
     `nccc/nccc.grammar` 改为 `kccc/kccc.grammar`（文法文件格式与内容零改动）。
+11. **类名 `Nc*` → `Yc*`，语法语言命名 `yc`**：类名前缀的 N 随 .Net，且
+    "nc 语法"之名易被误读为绑定技术栈；改为作者标识前缀 **Yc**（Y = sKabYY），
+    语法语言正式命名 **yc**——技术栈中立，`.grammar` 为可移植格式。类名
+    `NcParser`/`NcGrammarParser` → `YcParser`/`YcGrammarParser`；meta 文法资源
+    `kccc/kccc.grammar` → `kccc/yc.grammar`（文法文件格式与内容零改动）。
 
 其余实现——包括引用相等语义（`TokenStream.Equals` 中 Position 按引用比较、
 `ParseStack.Has` 中 parser 按引用比较、`CStar` 空匹配检测）——均按原版直译保留。

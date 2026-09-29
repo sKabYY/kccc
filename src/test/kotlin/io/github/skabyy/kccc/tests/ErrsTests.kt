@@ -1,6 +1,6 @@
 package io.github.skabyy.kccc.tests
 
-import io.github.skabyy.kccc.parser.NcParser
+import io.github.skabyy.kccc.parser.YcParser
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -21,7 +21,7 @@ root = (@err'L{expect} A L{or} B' oo:(@or 'A' 'B'))
 
     @Test
     fun testMessageLocale() {
-        val parser = NcParser.load(grammar) { settings ->
+        val parser = YcParser.load(grammar) { settings ->
             settings.locale.language = "zh-cn"
             settings.locale.set(
                 "zh-cn", mapOf(
@@ -44,7 +44,7 @@ root = (@err'L{expect} A L{or} B' oo:(@or 'A' 'B'))
 @include-builtin
 root = (@+ alpha) \eof
 """
-        val parser = NcParser.load(grmr)
+        val parser = YcParser.load(grmr)
         val result = parser.parse("a1")
         println(result.toSExp().toPrettyString())
         assertFalse(result.isSuccess())

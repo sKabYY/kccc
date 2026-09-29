@@ -2,7 +2,7 @@ package io.github.skabyy.kccc.parser
 
 import io.github.skabyy.kccc.common.ResourceUtils
 
-class NcGrammarParser : CombinedParser() {
+class YcGrammarParser : CombinedParser() {
 
     init {
         val space = pSpace()
@@ -153,8 +153,8 @@ class NcGrammarParser : CombinedParser() {
          * Reads the bootstrapping grammar resource.
          */
         @JvmStatic
-        fun getNcGrammarSource(): String {
-            return ResourceUtils.readString("kccc/kccc.grammar")
+        fun getYcGrammarSource(): String {
+            return ResourceUtils.readString("kccc/yccc.grammar")
         }
     }
 }

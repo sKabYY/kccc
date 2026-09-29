@@ -2,13 +2,13 @@ package io.github.skabyy.kccc.tests.calculator
 
 import io.github.skabyy.kccc.common.ResourceUtils
 import io.github.skabyy.kccc.parser.Node
-import io.github.skabyy.kccc.parser.NcParser
+import io.github.skabyy.kccc.parser.YcParser
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class Calculator {
 
-    private val parser = NcParser.loadFromResource("calculator/calculator.grammar")
+    private val parser = YcParser.loadFromResource("calculator/calculator.grammar")
 
     @Test
     fun testParser() {

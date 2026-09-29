@@ -4,7 +4,7 @@ import io.github.skabyy.kccc.common.Locale
 import io.github.skabyy.kccc.common.ResourceUtils
 import io.github.skabyy.kccc.exceptions.ParseException
 
-class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser() {
+class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser() {
 
     private var caseSensitive: Boolean
     private var splitWord: Boolean
@@ -13,7 +13,7 @@ class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
      * NOTE: the C# Settings properties are write-only; Kotlin cannot express
      * a private getter on a public var, so these are read/write instead.
      */
-    class Settings internal constructor(private val _parser: NcParser) {
+    class Settings internal constructor(private val _parser: YcParser) {
 
         val locale: Locale
             get() = _parser.`_`
@@ -51,7 +51,7 @@ class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
         val rootName = rootStm.stringValue()
 
         Node.match(optionStms) { type ->
-            type(NcGrammarParser.OPTION_STM) { es ->
+            type(YcGrammarParser.OPTION_STM) { es ->
                 setOption(es.first(), es.drop(1))
             }
         }
@@ -59,7 +59,7 @@ class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
         init?.invoke(Settings(this))
 
         Node.match(defStms) { type ->
-            type(NcGrammarParser.DEF_STM) { es ->
+            type(YcGrammarParser.DEF_STM) { es ->
                 val name = es.first().stringValue()
                 val ps = valueOfList(es.drop(1))
                 defParser(name, cSeq(*ps))
@@ -71,25 +71,25 @@ class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
 
     private fun setOption(cmd: Node, args: List<Node>) {
         cmd.match<Unit> { type ->
-            type(NcGrammarParser.CASE_SENSITIVE) { _ ->
+            type(YcGrammarParser.CASE_SENSITIVE) { _ ->
                 caseSensitive = valueOfOnOrOff(args.first())
             }
-            type(NcGrammarParser.LEX_IGNORE) { _ ->
+            type(YcGrammarParser.LEX_IGNORE) { _ ->
                 spacingParser = get(args.first().stringValue())
             }
-            type(NcGrammarParser.LEX_MODE) { _ ->
+            type(YcGrammarParser.LEX_MODE) { _ ->
                 spacingParser = null
             }
-            type(NcGrammarParser.SPLIT_WORD) { _ ->
+            type(YcGrammarParser.SPLIT_WORD) { _ ->
                 splitWord = valueOfOnOrOff(args.first())
             }
-            type(NcGrammarParser.INCLUDE_BUILTIN) { _ ->
+            type(YcGrammarParser.INCLUDE_BUILTIN) { _ ->
                 loadBuildinParsers()
             }
-            type(NcGrammarParser.SET_MESSAGE_LOCALE_START) { _ ->
+            type(YcGrammarParser.SET_MESSAGE_LOCALE_START) { _ ->
                 messageLocaleStart = args.first().stringValue()
             }
-            type(NcGrammarParser.SET_MESSAGE_LOCALE_END) { _ ->
+            type(YcGrammarParser.SET_MESSAGE_LOCALE_END) { _ ->
                 messageLocaleEnd = args.first().stringValue()
             }
         }
@@ -97,27 +97,27 @@ class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
 
     private fun valueOfOnOrOff(node: Node): Boolean {
         return node.match { type ->
-            type(NcGrammarParser.OPTION_ON) { _ -> true }
-            type(NcGrammarParser.OPTION_OFF) { _ -> false }
+            type(YcGrammarParser.OPTION_ON) { _ -> true }
+            type(YcGrammarParser.OPTION_OFF) { _ -> false }
         }
     }
 
     private fun valueOf(exp: Node): IParser {
         return exp.match { type ->
-            type(NcGrammarParser.NAMED_EXP) { es -> cIs(es.first().stringValue(), valueOf(es[1])) }
-            type(NcGrammarParser.GLOB_EXP) { es -> cGlob(valueOf(es.first())) }
-            type(NcGrammarParser.OP_EXP) { es -> applyOp(es.first(), *valueOfList(es.drop(1))) }
-            type(NcGrammarParser.ERR_EXP) { es -> cIfFail(es.first().stringValue(), cSeq(*valueOfList(es.drop(1)))) }
-            type(NcGrammarParser.SEQ_EXP) { es -> cSeq(*valueOfList(es)) }
-            type(NcGrammarParser.ANY_EXP) { _ -> pAny() }
-            type(NcGrammarParser.DBG_EXP) { es -> cDebug(cSeq(*valueOfList(es))) }
-            type(NcGrammarParser.DBG_1EXP) { es -> cDebug(valueOf(es.first())) }
-            type(NcGrammarParser.CHAR_EXP) { es -> valueOfCharExp(es.first()) }
-            type(NcGrammarParser.GLOB_CHAR_EXP) { es -> cGlob(valueOfCharExp(es.first())) }
-            type(NcGrammarParser.WORD_EXP) { es -> valueOfWordExp(es) }
-            type(NcGrammarParser.GLOB_WORD_EXP) { es -> cGlob(valueOfWordExp(es)) }
-            type(NcGrammarParser.VAR_EXP) { es -> get(Node.concatValue(es)) }
-            type(NcGrammarParser.ARRAY_EXP) { es ->
+            type(YcGrammarParser.NAMED_EXP) { es -> cIs(es.first().stringValue(), valueOf(es[1])) }
+            type(YcGrammarParser.GLOB_EXP) { es -> cGlob(valueOf(es.first())) }
+            type(YcGrammarParser.OP_EXP) { es -> applyOp(es.first(), *valueOfList(es.drop(1))) }
+            type(YcGrammarParser.ERR_EXP) { es -> cIfFail(es.first().stringValue(), cSeq(*valueOfList(es.drop(1)))) }
+            type(YcGrammarParser.SEQ_EXP) { es -> cSeq(*valueOfList(es)) }
+            type(YcGrammarParser.ANY_EXP) { _ -> pAny() }
+            type(YcGrammarParser.DBG_EXP) { es -> cDebug(cSeq(*valueOfList(es))) }
+            type(YcGrammarParser.DBG_1EXP) { es -> cDebug(valueOf(es.first())) }
+            type(YcGrammarParser.CHAR_EXP) { es -> valueOfCharExp(es.first()) }
+            type(YcGrammarParser.GLOB_CHAR_EXP) { es -> cGlob(valueOfCharExp(es.first())) }
+            type(YcGrammarParser.WORD_EXP) { es -> valueOfWordExp(es) }
+            type(YcGrammarParser.GLOB_WORD_EXP) { es -> cGlob(valueOfWordExp(es)) }
+            type(YcGrammarParser.VAR_EXP) { es -> get(Node.concatValue(es)) }
+            type(YcGrammarParser.ARRAY_EXP) { es ->
                 val parser = valueOf(es[1])
                 val size = es[0].stringValue().toIntOrNull()
                 if (size != null) {
@@ -136,7 +136,7 @@ class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
 
     private fun valueOfCharExp(node: Node): IParser {
         return node.match { type ->
-            type(NcGrammarParser.NORMAL_CHAR) { es ->
+            type(YcGrammarParser.NORMAL_CHAR) { es ->
                 if (es.size == 1) {
                     pChar(es.first().value)
                 } else {
@@ -144,12 +144,12 @@ class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
                     throw ParseException("not a char (row ${pos.linenum}, column ${pos.colnum})")
                 }
             }
-            type(NcGrammarParser.SPECIAL_CHAR) { es ->
+            type(YcGrammarParser.SPECIAL_CHAR) { es ->
                 val charName = Node.concatValue(es)
                 when (charName) {
-                    NcGrammarParser.SPECIAL_CHAR_EOF -> pEof()
-                    NcGrammarParser.SPECIAL_CHAR_NEWLINE -> pNewline()
-                    NcGrammarParser.SPECIAL_CHAR_SPACE -> pSpace()
+                    YcGrammarParser.SPECIAL_CHAR_EOF -> pEof()
+                    YcGrammarParser.SPECIAL_CHAR_NEWLINE -> pNewline()
+                    YcGrammarParser.SPECIAL_CHAR_SPACE -> pSpace()
                     else -> {
                         val pos = es.first().start!!
                         throw ParseException("unknown char '$charName' at row ${pos.linenum} column ${pos.colnum}")
@@ -177,14 +177,14 @@ class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
         val opName = op.stringValue()
         val pos = op.start!!
         return when (opName) {
-            NcGrammarParser.PLUS_CMB -> cPlus(*ps)
-            NcGrammarParser.STAR_CMB -> cStar(*ps)
-            NcGrammarParser.OR_CMB -> cOr(*ps)
-            NcGrammarParser.SEQ_CMB -> cSeq(*ps)
-            NcGrammarParser.JOIN_CMB -> cJoin(ps.first(), *ps.drop(1).toTypedArray())
-            NcGrammarParser.JOIN_PLUS_CMB -> cJoinPlus(ps.first(), *ps.drop(1).toTypedArray())
-            NcGrammarParser.NOT_CMB -> cNot(*ps)
-            NcGrammarParser.MAYBE_CMB -> cMaybe(*ps)
+            YcGrammarParser.PLUS_CMB -> cPlus(*ps)
+            YcGrammarParser.STAR_CMB -> cStar(*ps)
+            YcGrammarParser.OR_CMB -> cOr(*ps)
+            YcGrammarParser.SEQ_CMB -> cSeq(*ps)
+            YcGrammarParser.JOIN_CMB -> cJoin(ps.first(), *ps.drop(1).toTypedArray())
+            YcGrammarParser.JOIN_PLUS_CMB -> cJoinPlus(ps.first(), *ps.drop(1).toTypedArray())
+            YcGrammarParser.NOT_CMB -> cNot(*ps)
+            YcGrammarParser.MAYBE_CMB -> cMaybe(*ps)
             else -> throw ParseException("unkown op '$opName' at row ${pos.linenum} column ${pos.colnum}")
         }
     }
@@ -193,9 +193,9 @@ class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
 
         @JvmStatic
         @JvmOverloads
-        fun load(src: String, init: ((Settings) -> Unit)? = null): NcParser {
-            val ncgp = NcGrammarParser()
-            val parseResult = ncgp.parse(src)
+        fun load(src: String, init: ((Settings) -> Unit)? = null): YcParser {
+            val ycgp = YcGrammarParser()
+            val parseResult = ycgp.parse(src)
             if (!parseResult.isSuccess()) {
                 throw ParseException("parsing grammar failed: (message: ${parseResult.message}, rest: ${parseResult.failRest})")
             }
@@ -204,8 +204,8 @@ class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
 
         @JvmStatic
         @JvmOverloads
-        fun load(grammarAst: Node, init: ((Settings) -> Unit)? = null): NcParser {
-            return NcParser(grammarAst, init)
+        fun load(grammarAst: Node, init: ((Settings) -> Unit)? = null): YcParser {
+            return YcParser(grammarAst, init)
         }
 
         /**
@@ -214,7 +214,7 @@ class NcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
          */
         @JvmStatic
         @JvmOverloads
-        fun loadFromResource(path: String, init: ((Settings) -> Unit)? = null): NcParser {
+        fun loadFromResource(path: String, init: ((Settings) -> Unit)? = null): YcParser {
             val src = ResourceUtils.readString(path)
             return load(src, init)
         }

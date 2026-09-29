@@ -2,7 +2,7 @@ package io.github.skabyy.kccc.tests.sql
 
 import io.github.skabyy.kccc.common.ResourceUtils
 import io.github.skabyy.kccc.parser.Node
-import io.github.skabyy.kccc.parser.NcParser
+import io.github.skabyy.kccc.parser.YcParser
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -13,8 +13,8 @@ class SQLTests {
     private val errSql = ResourceUtils.readString("sql/sample-err.sql")
 
     companion object {
-        private fun getSqlParser(): NcParser {
-            return NcParser.loadFromResource("sql/sql.grammar") { settings ->
+        private fun getSqlParser(): YcParser {
+            return YcParser.loadFromResource("sql/sql.grammar") { settings ->
                 settings.caseSensitive = false
             }
         }
