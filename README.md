@@ -1,13 +1,14 @@
-# Nccc (JVM/Kotlin)
+# Kccc (Kotlin/JVM)
 
-Nccc（**N**ccc's **c**haracter-level **c**ombinator **p**arser）的 JVM 移植版：一个
-Parsec 风格的解析器组合子运行时库。本仓库是原 C# 项目
+Kccc（**K**otlin **C**ompiler **C**ompiler **C**ombinator；原名 Nccc = **.Net**
+Compiler Compiler Combinator，随平台更名）的 JVM 移植版：一个 Parsec 风格的解析器
+组合子运行时库。本仓库是原 C# 项目
 [Nccc](https://github.com/sKabYY/Nccc)（.NET 版 2.0.3）的 **1:1 直译**移植，使用
 Kotlin 编写，零第三方运行时依赖。
 
 - 原理：字符级扫描（一个 Token = 一个字符），`.grammar` 语法文件由手写的
   `NcGrammerParser`（bootstrap 解析器）解析为 AST，再由 `NcParser` 解释成解析器树。
-- 自举：`nccc/nccc.grammar`（资源文件）描述了语法文件本身的语法，因此 Nccc 可以
+- 自举：`kccc/kccc.grammar`（资源文件）描述了语法文件本身的语法，因此 Kccc 可以
   解析自己的语法描述（见 `BootstrappingTests`：手写解析器 → 一级解释 → 二级 P2P
   生成，三份解析结果 SExp 输出要求 **diff 为零**）。
 
@@ -34,13 +35,13 @@ gradlew build        # 编译 + 全部测试
 gradlew test         # 仅测试
 ```
 
-全部 30 个测试通过，覆盖原仓库全部 8 组测试（Bootstrap 三级自举、Calculator、
+全部 29 个测试通过，覆盖原仓库全部 8 组测试（Bootstrap 三级自举、Calculator、
 Errs（错误消息本地化）、Json、LexMode（定宽词法模式）、Samples、SExp、SQL）。
 
 ## 结构
 
 ```
-io.github.skabyy.nccc
+io.github.skabyy.kccc
 ├── common          TextPosition / SExp / Locale / ResourceUtils
 ├── exceptions      ParseException / ReachEofException / NodeMethodException
 ├── scanner         CharScanner / Token / TokenStream
@@ -69,7 +70,7 @@ io.github.skabyy.nccc
 root = (@+ alpha) \eof
 ```
 
-详细语法见 `src/main/resources/nccc/nccc.grammar` 自身（92 行，带注释），以及
+详细语法见 `src/main/resources/kccc/kccc.grammar` 自身（92 行，带注释），以及
 `src/test/resources/` 下的 calculator / json / lexMode / sql 文法与样例。
 
 ## 与原版的差异（除语言平台外，仅以下几处）
@@ -98,6 +99,10 @@ root = (@+ alpha) \eof
    行 diff 替代（控制台着色简化为 `+ `/`- ` 前缀），断言语义不变。
 9. **线程安全**：与原版一致，`MemorizedParser` 的记忆表按偏移缓存、不区分解析
    栈，**解析器实例非线程安全**（每次 parse 前会清空缓存）。
+10. **项目改名 Nccc → Kccc**：原名的 N 指 .Net，随平台更名。类名
+    （`NcParser`/`NcGrammerParser`）保留——"Nc" 视为语法语言本身的名字，属继承物；
+    引导文法资源路径由 `nccc/nccc.grammar` 改为 `kccc/kccc.grammar`
+    （文法文件格式与内容零改动）。
 
 其余实现——包括引用相等语义（`TokenStream.Equals` 中 Position 按引用比较、
 `ParseStack.Has` 中 parser 按引用比较、`CStar` 空匹配检测）——均按原版直译保留。

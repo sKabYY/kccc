@@ -7,4 +7,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "nccc"
+rootProject.name = "kccc"
