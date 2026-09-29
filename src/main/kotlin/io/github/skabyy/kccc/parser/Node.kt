@@ -88,20 +88,15 @@ sealed class Node {
      * `Match(Action<Action<string, Action<IList<Node>>>>)` / `Match<T>(...)`
      * pair — the generic form alone subsumes the void form (T = Unit).
      */
-    fun <T> match(block: ((String, (List<Node>) -> T) -> Unit) -> Unit): T {
-        var value: Any? = null
-        var hit = false
+    fun <T : Any> match(block: ((String, (List<Node>) -> T) -> Unit) -> Unit): T {
+        var value: T? = null
         block { type, proc ->
             if (this.type == type && this is Internal) {
                 value = proc(children)
-                hit = true
             }
         }
-        if (!hit) {
-            throw NodeMethodException(this, "match error: unknown type \"${this.type}\" for node ${toSExp().toPrettyString()}")
-        }
-        @Suppress("UNCHECKED_CAST")
-        return value as T
+        return value ?: throw NodeMethodException(
+            this, "match error: unknown type \"${this.type}\" for node ${toSExp().toPrettyString()}")
     }
 
     fun <T> digSomething(
