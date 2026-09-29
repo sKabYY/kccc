@@ -35,7 +35,7 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
             set(value) { parser.useMemorizedParser = value }
     }
 
-    private fun internalChildren(node: Node, what: String): MutableList<Node> {
+    private fun internalChildren(node: Node, what: String): List<Node> {
         return when (node) {
             is Node.Internal -> node.children
             is Node.Leaf -> throw ParseException("$what must be a node")
@@ -164,7 +164,7 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
     }
 
     private fun valueOfWordExp(es: List<Node>): IParser {
-        val word = Node.concatValue(es.toMutableList())
+        val word = Node.concatValue(es)
         if (!word.isBlank() && splitWord) {
             // C# `word.Split()` splits on runs of whitespace and drops empty
             // entries; the filter reproduces that after a regex split.

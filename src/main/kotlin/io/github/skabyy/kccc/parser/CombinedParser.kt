@@ -375,10 +375,10 @@ open class CombinedParser protected constructor() {
     ): ParseResult {
         val fr = failRest ?: rest
         return if (success) {
-            ParseResult.Success(nodes?.toMutableList() ?: mutableListOf(), rest, message, fr, start, end)
+            ParseResult.Success(nodes ?: emptyList(), rest, message, fr, start, end)
         } else {
             ParseResult.Failure(
-                nodes?.toMutableList(),
+                nodes,
                 rest,
                 requireNotNull(message) { "failure result without a message" },
                 fr, start, end)
@@ -401,7 +401,7 @@ open class CombinedParser protected constructor() {
     private fun mergeResults(results: List<ParseResult>, rest: TokenStream, messageIn: String?, failRestIn: TokenStream?): ParseResult {
         var message = messageIn
         var failRest = failRestIn
-        val nodes = results.filter { it.isSuccess() }.mapNotNull { it.nodes }.flatMap { it }.toMutableList()
+        val nodes = results.filter { it.isSuccess() }.mapNotNull { it.nodes }.flatMap { it }
         var success = true
         if (results.isNotEmpty()) {
             val lastR = results.last()

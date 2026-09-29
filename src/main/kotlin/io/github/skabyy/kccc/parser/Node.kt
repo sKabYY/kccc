@@ -88,7 +88,7 @@ sealed class Node {
      * `Match(Action<Action<string, Action<IList<Node>>>>)` / `Match<T>(...)`
      * pair — the generic form alone subsumes the void form (T = Unit).
      */
-    fun <T> match(block: ((String, (MutableList<Node>) -> T) -> Unit) -> Unit): T {
+    fun <T> match(block: ((String, (List<Node>) -> T) -> Unit) -> Unit): T {
         var value: Any? = null
         var hit = false
         block { type, proc ->
@@ -172,7 +172,7 @@ sealed class Node {
 
     class Internal(
         override val type: String?,
-        val children: MutableList<Node>,
+        val children: List<Node>,
         override val start: TextPosition?,
         override val end: TextPosition?
     ) : Node()
@@ -180,7 +180,7 @@ sealed class Node {
     companion object {
 
         @JvmStatic
-        fun concatValue(nodes: MutableList<Node>): String {
+        fun concatValue(nodes: List<Node>): String {
             val node = nodes.firstOrNull { it !is Leaf }
             if (node != null) {
                 throw NodeMethodException(node, "expect a leaf but got ${node.toSExp().toPrettyString()} at ${nodePosition(node)}")
@@ -194,38 +194,38 @@ sealed class Node {
         }
 
         @JvmStatic
-        fun makeNode(type: String?, children: MutableList<Node>?, start: TextPosition?, end: TextPosition?): Internal {
-            return Internal(type, children ?: mutableListOf(), start, end)
+        fun makeNode(type: String?, children: List<Node>?, start: TextPosition?, end: TextPosition?): Internal {
+            return Internal(type, children ?: emptyList(), start, end)
         }
 
         @JvmStatic
-        fun match(nodes: MutableList<Node>, block: ((String, (MutableList<Node>) -> Unit) -> Unit) -> Unit) {
+        fun match(nodes: List<Node>, block: ((String, (List<Node>) -> Unit) -> Unit) -> Unit) {
             for (node in nodes) {
                 node.match(block)
             }
         }
 
         @JvmStatic
-        fun digNode(nodes: MutableList<Node>, vararg path: String): Node {
+        fun digNode(nodes: List<Node>, vararg path: String): Node {
             return Internal(null, nodes, null, null).digNode(*path)
         }
 
         @JvmStatic
-        fun tryDigNode(nodes: MutableList<Node>, vararg path: String): Node? {
+        fun tryDigNode(nodes: List<Node>, vararg path: String): Node? {
             return Internal(null, nodes, null, null).tryDigNode(*path)
         }
 
         @JvmStatic
-        fun digNodeOrNull(nodes: MutableList<Node>, vararg path: String): Node? {
+        fun digNodeOrNull(nodes: List<Node>, vararg path: String): Node? {
             return Internal(null, nodes, null, null).digNodeOrNull(*path)
         }
 
         @JvmStatic
-        fun digValue(nodes: MutableList<Node>, vararg path: String): String {
+        fun digValue(nodes: List<Node>, vararg path: String): String {
             return Internal(null, nodes, null, null).digValue(*path)
         }
 
-        private fun nodesToString(nodes: MutableList<Node>): String {
+        private fun nodesToString(nodes: List<Node>): String {
             return String(nodes.map { (it as Leaf).value }.toCharArray())
         }
     }

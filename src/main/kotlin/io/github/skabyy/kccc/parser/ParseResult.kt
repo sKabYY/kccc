@@ -13,7 +13,7 @@ import io.github.skabyy.kccc.scanner.TokenStream
  */
 sealed class ParseResult {
 
-    abstract val nodes: MutableList<Node>?
+    abstract val nodes: List<Node>?
     abstract val rest: TokenStream
     abstract val message: String?
     abstract val failRest: TokenStream
@@ -74,7 +74,7 @@ sealed class ParseResult {
     }
 
     class Success(
-        override val nodes: MutableList<Node>,
+        override val nodes: List<Node>,
         override val rest: TokenStream,
         override val message: String?,
         override val failRest: TokenStream,
@@ -84,7 +84,7 @@ sealed class ParseResult {
     ) : ParseResult()
 
     class Failure(
-        override val nodes: MutableList<Node>?,
+        override val nodes: List<Node>?,
         override val rest: TokenStream,
         override val message: String,
         override val failRest: TokenStream,
