@@ -5,43 +5,41 @@ import io.github.skabyy.kccc.common.SExp
 import io.github.skabyy.kccc.common.TextPosition
 import io.github.skabyy.kccc.scanner.TokenStream
 
-class ParseResult {
+/**
+ * Result of a parse, sealed into [Success] and [Failure] so the machinery can
+ * branch on the outcome and the established invariants become types:
+ * `rest`/`failRest` are always set, a [Failure] always carries a message, and
+ * a [Success] always carries its (possibly empty) nodes.
+ */
+sealed class ParseResult {
 
-    var nodes: MutableList<Node>? = null
-    var success: Boolean = false
-    var rest: TokenStream? = null
-    var message: String? = null
-    var failRest: TokenStream? = null
-    var start: TextPosition? = null
-    var end: TextPosition? = null
-    var parserName: String? = null
+    abstract val nodes: MutableList<Node>?
+    abstract val rest: TokenStream
+    abstract val message: String?
+    abstract val failRest: TokenStream
+    abstract val start: TextPosition?
+    abstract val end: TextPosition?
+    abstract var parserName: String?
 
     fun isSuccess(): Boolean {
-        return nodes != null && success
+        return this is Success
     }
 
     fun deeper(r: ParseResult?): ParseResult {
-        if (r == null || r.failRest!!.position().offset <= failRest!!.position().offset) {
-            return this
-        }
-        return r
+        if (r == null) return this
+        return if (r.failRest.position().offset <= failRest.position().offset) this else r
     }
 
-    fun failResult(): ParseResult {
-        val r = ParseResult()
-        r.success = false
-        r.nodes = nodes
-        r.rest = rest
-        r.message = message
-        r.failRest = failRest
-        r.start = start
-        r.end = end
-        return r
+    fun failResult(): Failure {
+        return when (this) {
+            is Failure -> this
+            is Success -> Failure(nodes, rest, message ?: "parse failed", failRest, start, end, parserName)
+        }
     }
 
     fun toSExp(): ListSExp {
         val list = SExp.list(SExp.list("success?", isSuccess()))
-        if (isSuccess()) {
+        if (this is Success) {
             list.push(
                 SExp.list("nodes", nodesSExp()),
                 SExp.list("rest", rest),
@@ -74,4 +72,24 @@ class ParseResult {
     private fun nodesSExp(): Any? {
         return nodes?.map { it.toSExp() }?.toTypedArray()?.let { SExp.list(*it) }
     }
+
+    class Success(
+        override val nodes: MutableList<Node>,
+        override val rest: TokenStream,
+        override val message: String?,
+        override val failRest: TokenStream,
+        override val start: TextPosition?,
+        override val end: TextPosition?,
+        override var parserName: String? = null
+    ) : ParseResult()
+
+    class Failure(
+        override val nodes: MutableList<Node>?,
+        override val rest: TokenStream,
+        override val message: String,
+        override val failRest: TokenStream,
+        override val start: TextPosition? = null,
+        override val end: TextPosition? = null,
+        override var parserName: String? = null
+    ) : ParseResult()
 }

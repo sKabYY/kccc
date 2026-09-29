@@ -44,10 +44,10 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
         spacingParser = cGlob(cStar(pSpace()))
         // ===============
 
-        val nodes = grammarAst.children!!
+        val nodes = requireNotNull(grammarAst.children) { "grammar AST node without children" }
         val rootStm = nodes.first()
-        val optionStms = nodes[1].children!!
-        val defStms = nodes[2].children!!
+        val optionStms = requireNotNull(nodes[1].children) { "grammar AST option-section without children" }
+        val defStms = requireNotNull(nodes[2].children) { "grammar AST def-section without children" }
         val rootName = rootStm.stringValue()
 
         Node.match(optionStms) { type ->
@@ -123,8 +123,7 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
                 if (size != null) {
                     cArray(parser, size)
                 } else {
-                    val pos = es[0].start!!
-                    throw ParseException("expect an integer at row ${pos.linenum} column ${pos.colnum}")
+                    throw ParseException("expect an integer at ${nodePosition(es[0])}")
                 }
             }
         }
@@ -140,8 +139,7 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
                 if (es.size == 1) {
                     pChar(es.first().value)
                 } else {
-                    val pos = es.first().start!!
-                    throw ParseException("not a char (row ${pos.linenum}, column ${pos.colnum})")
+                    throw ParseException("not a char (${nodePosition(es.first())})")
                 }
             }
             type(YcGrammarParser.SPECIAL_CHAR) { es ->
@@ -151,8 +149,7 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
                     YcGrammarParser.SPECIAL_CHAR_NEWLINE -> pNewline()
                     YcGrammarParser.SPECIAL_CHAR_SPACE -> pSpace()
                     else -> {
-                        val pos = es.first().start!!
-                        throw ParseException("unknown char '$charName' at row ${pos.linenum} column ${pos.colnum}")
+                        throw ParseException("unknown char '$charName' at ${nodePosition(es.first())}")
                     }
                 }
             }
@@ -175,7 +172,6 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
 
     private fun applyOp(op: Node, vararg ps: IParser): IParser {
         val opName = op.stringValue()
-        val pos = op.start!!
         return when (opName) {
             YcGrammarParser.PLUS_CMB -> cPlus(*ps)
             YcGrammarParser.STAR_CMB -> cStar(*ps)
@@ -185,7 +181,7 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
             YcGrammarParser.JOIN_PLUS_CMB -> cJoinPlus(ps.first(), *ps.drop(1).toTypedArray())
             YcGrammarParser.NOT_CMB -> cNot(*ps)
             YcGrammarParser.MAYBE_CMB -> cMaybe(*ps)
-            else -> throw ParseException("unkown op '$opName' at row ${pos.linenum} column ${pos.colnum}")
+            else -> throw ParseException("unknown op '$opName' at ${nodePosition(op)}")
         }
     }
 
@@ -196,10 +192,11 @@ class YcParser(grammarAst: Node, init: ((Settings) -> Unit)?) : CombinedParser()
         fun load(src: String, init: ((Settings) -> Unit)? = null): YcParser {
             val ycgp = YcGrammarParser()
             val parseResult = ycgp.parse(src)
-            if (!parseResult.isSuccess()) {
-                throw ParseException("parsing grammar failed: (message: ${parseResult.message}, rest: ${parseResult.failRest})")
+            return when (parseResult) {
+                is ParseResult.Failure -> throw ParseException(
+                    "parsing grammar failed: (message: ${parseResult.message}, rest: ${parseResult.failRest})")
+                is ParseResult.Success -> load(parseResult.nodes.first(), init)
             }
-            return load(parseResult.nodes!!.first(), init)
         }
 
         @JvmStatic

@@ -208,16 +208,18 @@ open class CombinedParser protected constructor() {
             val results = ArrayList<ParseResult>()
             for (p in ps) {
                 val r = p.parse(curToks, stk)
-                if (r.message != null) {
-                    deepest = r.deeper(deepest)
+                when (r) {
+                    is ParseResult.Failure -> {
+                        val d = r.deeper(deepest)
+                        deepest = d
+                        results.add(d)
+                        break
+                    }
+                    is ParseResult.Success -> {
+                        curToks = r.rest
+                        results.add(r)
+                    }
                 }
-                if (!r.isSuccess()) {
-                    val failResult = deepest!!.failResult()
-                    results.add(failResult)
-                    break
-                }
-                curToks = r.rest!!
-                results.add(r)
             }
             val message = deepest?.message
             val failRest = deepest?.failRest
@@ -238,10 +240,11 @@ open class CombinedParser protected constructor() {
         val parser = cSeq(*ps)
         return ParserImpl { toks, stk ->
             val r = parser.parse(toks, stk)
-            if (!r.isSuccess()) {
-                r
-            } else {
-                outputNode(Node.makeNode(type, r.nodes, r.start, r.end), r.rest!!, r.message, r.failRest)
+            when (r) {
+                is ParseResult.Failure -> r
+                is ParseResult.Success -> outputNode(
+                    Node.makeNode(type, r.nodes, r.start, r.end),
+                    r.rest, r.message, r.failRest)
             }
         }
     }
@@ -250,10 +253,13 @@ open class CombinedParser protected constructor() {
         val parser = cSeq(*ps)
         return ParserImpl { toks, stk ->
             val r = parser.parse(toks, stk)
-            if (r.isSuccess()) {
-                outputEmpty(r.rest!!, r.start!!, r.end!!, r.message, r.failRest)
-            } else {
-                r
+            when (r) {
+                is ParseResult.Success -> outputEmpty(
+                    r.rest,
+                    requireNotNull(r.start) { "parse result missing start" },
+                    requireNotNull(r.end) { "parse result missing end" },
+                    r.message, r.failRest)
+                is ParseResult.Failure -> r
             }
         }
     }
@@ -261,25 +267,26 @@ open class CombinedParser protected constructor() {
     protected fun cIfFail(failMessage: String, parser: IParser): IParser {
         return ParserImpl { toks, stk ->
             val r = parser.parse(toks, stk)
-            if (r.isSuccess()) {
-                r
-            } else {
-                outputFail(failMessage, r.rest!!)
+            when (r) {
+                is ParseResult.Success -> r
+                is ParseResult.Failure -> outputFail(failMessage, r.rest)
             }
         }
     }
 
     protected fun cOr(vararg ps: IParser): IParser {
         return ParserImpl { toks, stk ->
-            var result: ParseResult? = null
+            var result: ParseResult.Success? = null
             var deepest: ParseResult? = null
             for (p in ps) {
                 val r = p.parse(toks, stk)
-                if (r.isSuccess()) {
-                    result = r
-                    break
+                when (r) {
+                    is ParseResult.Success -> {
+                        result = r
+                        break
+                    }
+                    is ParseResult.Failure -> deepest = r.deeper(deepest)
                 }
-                deepest = r.deeper(deepest)
             }
             result ?: deepest ?: outputFail("empty OR", toks)
         }
@@ -305,16 +312,18 @@ open class CombinedParser protected constructor() {
             while (true) {
                 val r = parser.parse(curToks, stk)
                 deepest = r.deeper(deepest)
-                if (!r.isSuccess()) {
-                    break
+                when (r) {
+                    is ParseResult.Failure -> break
+                    is ParseResult.Success -> {
+                        // `toks == r.Rest` in C# is TokenStream's *custom* Equals
+                        // (same scanner, same string, same position object).
+                        if (curToks == r.rest) {
+                            fatal("empty-star detected", parser, curToks, stk)
+                        }
+                        curToks = r.rest
+                        results.add(r)
+                    }
                 }
-                // `toks == r.Rest` in C# is TokenStream's *custom* Equals
-                // (same scanner, same string, same position object).
-                if (curToks == r.rest) {
-                    fatal("empty-star detected", parser, curToks, stk)
-                }
-                curToks = r.rest!!
-                results.add(r)
             }
             mergeResults(results, curToks, deepest.message, deepest.failRest)
         }
@@ -355,48 +364,44 @@ open class CombinedParser protected constructor() {
         env[name] = p
     }
 
-    private fun outputNodes(
+    private fun makeResult(
         success: Boolean,
         nodes: List<Node>?,
-        rest: TokenStream?,
+        rest: TokenStream,
         start: TextPosition?,
         end: TextPosition?,
         message: String? = null,
         failRest: TokenStream? = null
     ): ParseResult {
-        val r = ParseResult()
-        r.success = success
-        r.nodes = nodes?.toMutableList()
-        r.rest = rest
-        r.message = message
-        r.failRest = failRest ?: rest
-        r.start = start
-        r.end = end
-        return r
+        val fr = failRest ?: rest
+        return if (success) {
+            ParseResult.Success(nodes?.toMutableList() ?: mutableListOf(), rest, message, fr, start, end)
+        } else {
+            ParseResult.Failure(
+                nodes?.toMutableList(),
+                rest,
+                requireNotNull(message) { "failure result without a message" },
+                fr, start, end)
+        }
     }
 
     private fun outputNode(node: Node, rest: TokenStream, message: String? = null, failRest: TokenStream? = null): ParseResult {
-        return outputNodes(true, listOf(node), rest, node.start, node.end, message, failRest)
+        return makeResult(true, listOf(node), rest, node.start, node.end, message, failRest)
     }
 
     private fun outputEmpty(rest: TokenStream, start: TextPosition, end: TextPosition, message: String? = null, failRest: TokenStream? = null): ParseResult {
-        return outputNodes(true, emptyList(), rest, start, end, message, failRest)
+        return makeResult(true, emptyList(), rest, start, end, message, failRest)
     }
 
     private fun outputFail(message: String, rest: TokenStream): ParseResult {
-        val r = ParseResult()
-        r.success = false
-        r.message = messageLocaleString(message)
-        r.rest = rest
-        r.failRest = rest
-        return r
+        return ParseResult.Failure(null, rest, messageLocaleString(message), rest)
     }
 
     // Assert results[0...-1] succeed
     private fun mergeResults(results: List<ParseResult>, rest: TokenStream, messageIn: String?, failRestIn: TokenStream?): ParseResult {
         var message = messageIn
         var failRest = failRestIn
-        val nodes = results.filter { it.isSuccess() }.flatMap { it.nodes!! }.toMutableList()
+        val nodes = results.filter { it.isSuccess() }.mapNotNull { it.nodes }.flatMap { it }.toMutableList()
         var success = true
         if (results.isNotEmpty()) {
             val lastR = results.last()
@@ -408,7 +413,7 @@ open class CombinedParser protected constructor() {
         }
         val startIdx = if (results.isEmpty()) rest.position() else results.first().start
         val endIdx = if (results.isEmpty()) rest.position() else results.last().end
-        return outputNodes(success, nodes, rest, startIdx, endIdx, message, failRest)
+        return makeResult(success, nodes, rest, startIdx, endIdx, message, failRest)
     }
 
     private fun messageLocaleString(s: String): String {

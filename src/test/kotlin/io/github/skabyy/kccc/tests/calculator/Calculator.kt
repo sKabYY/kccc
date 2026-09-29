@@ -5,6 +5,7 @@ import io.github.skabyy.kccc.parser.Node
 import io.github.skabyy.kccc.parser.YcParser
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import kotlin.math.pow
 
 class Calculator {
 
@@ -30,7 +31,7 @@ class Calculator {
         type("sub") { es -> valueOf(es[0]) - valueOf(es[1]) }
         type("mul") { es -> valueOf(es[0]) * valueOf(es[1]) }
         type("div") { es -> valueOf(es[0]) / valueOf(es[1]) }
-        type("pow") { es -> Math.pow(valueOf(es[0]), valueOf(es[1])) }
+        type("pow") { es -> valueOf(es[0]).pow(valueOf(es[1])) }
         type("neg") { es -> -valueOf(es[0]) }
         type("num") { es -> Node.concatValue(es).toDouble() }
     }

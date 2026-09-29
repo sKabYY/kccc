@@ -111,6 +111,9 @@ root = (@+ alpha) \eof
     `.grammar` 为可移植格式。类名 `NcParser`/`NcGrammarParser` →
     `YcParser`/`YcGrammarParser`；meta 文法资源 `kccc/kccc.grammar` →
     `kccc/yccc.grammar`（文法文件格式与内容零改动）。
+12. **错误消息拼写修正 `colum`/`unkown` → `column`/`unknown`**：原版错误消息
+    里的两个错别字（"colum"、"unkown op"），移植版随错误消息统一格式化顺带
+    修正（测试无断言）。
 
 其余实现——包括引用相等语义（`TokenStream.Equals` 中 Position 按引用比较、
 `ParseStack.Has` 中 parser 按引用比较、`CStar` 空匹配检测）——均按原版直译保留。

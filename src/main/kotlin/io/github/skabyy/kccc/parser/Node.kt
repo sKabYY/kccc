@@ -5,6 +5,15 @@ import io.github.skabyy.kccc.common.TextPosition
 import io.github.skabyy.kccc.exceptions.NodeMethodException
 import io.github.skabyy.kccc.scanner.Token
 
+/**
+ * Renders a node's start position for error messages ("unknown position"
+ * when the node carries none), so message construction keeps the intended
+ * exception type instead of NPE-ing on a missing position.
+ */
+internal fun nodePosition(node: Node): String {
+    return node.start?.let { "row ${it.linenum} column ${it.colnum}" } ?: "unknown position"
+}
+
 class Node {
 
     var type: String? = null
@@ -18,7 +27,7 @@ class Node {
     }
 
     fun isStringNode(): Boolean {
-        return children != null && children!!.all { it.isLeaf() }
+        return children?.all { it.isLeaf() } == true
     }
 
     /**
@@ -26,8 +35,9 @@ class Node {
      * a string node (replacement for the C# `TryGetStringValue(out ...)`).
      */
     fun tryGetStringValue(): String? {
-        if (isStringNode()) {
-            return nodesToString(children!!)
+        val c = children
+        if (c != null && c.all { it.isLeaf() }) {
+            return nodesToString(c)
         }
         return null
     }
@@ -37,23 +47,20 @@ class Node {
         if (value != null) {
             return value
         }
-        val pos = start!!
-        throw NodeMethodException(this, "can't get StringValue of node ${toSExp().toPrettyString()} at row ${pos.linenum} colum ${pos.colnum}")
+        throw NodeMethodException(this, "can't get StringValue of node ${toSExp().toPrettyString()} at ${nodePosition(this)}")
     }
 
     fun toSExp(): SExp {
-        if (isLeaf()) {
-            return SExp.value(value)
-        }
+        val c = children ?: return SExp.value(value)
         val strValue = tryGetStringValue()
         if (strValue != null) {
             val lst = SExp.list(getNodeMeta())
-            if (!strValue.isNullOrEmpty()) {
+            if (strValue.isNotEmpty()) {
                 lst.push(strValue)
             }
             return lst
         }
-        val lst = SExp.list(*children!!.map { it.toSExp() }.toTypedArray())
+        val lst = SExp.list(*c.map { it.toSExp() }.toTypedArray())
         lst.pushFront(getNodeMeta())
         return lst
     }
@@ -77,7 +84,7 @@ class Node {
         var hit = false
         block { type, proc ->
             if (this.type == type) {
-                value = proc(children!!)
+                value = proc(requireNotNull(children) { "type match on node without children" })
                 hit = true
             }
         }
@@ -96,10 +103,8 @@ class Node {
     ): T {
         var node = this
         for (i in path.indices) {
-            if (node.isLeaf()) {
-                return notFound(path[i], node)
-            }
-            val found = node.children!!.filter { it.type == path[i] }
+            val c = node.children ?: return notFound(path[i], node)
+            val found = c.filter { it.type == path[i] }
             when (found.size) {
                 0 -> return notFound(path[i], node)
                 1 -> node = found[0]
@@ -151,8 +156,7 @@ class Node {
         fun concatValue(nodes: MutableList<Node>): String {
             val node = nodes.firstOrNull { !it.isLeaf() }
             if (node != null) {
-                val pos = node.start
-                throw NodeMethodException(node, "expect a leaf but got ${node.toSExp().toPrettyString()} at row ${pos!!.linenum} column ${pos.colnum}")
+                throw NodeMethodException(node, "expect a leaf but got ${node.toSExp().toPrettyString()} at ${nodePosition(node)}")
             }
             return nodesToString(nodes)
         }
