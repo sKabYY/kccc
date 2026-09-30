@@ -151,7 +151,6 @@ open class CombinedParser protected constructor() {
     }
 
     protected fun pRange(c1: Char, c2: Char): IParser {
-        // TODO: locale
         return pTokenPred("expect char between '$c1' and '$c2'") { tok ->
             c1 <= tok.value && tok.value <= c2
         }
@@ -199,7 +198,6 @@ open class CombinedParser protected constructor() {
     // =====================================================================
 
     protected fun cSeq(vararg ps: IParser): IParser {
-        // TODO: 使用SeqParserImpl简化parser复杂度
         if (ps.isEmpty()) throw ParseException("empty CSeq")
         if (ps.size == 1) return ps.first()
         return ParserImpl { toks, stk ->
