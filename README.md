@@ -74,6 +74,9 @@ root = (@+ alpha) \eof
 详细语法见 `src/main/resources/kccc/yccc.grammar` 自身（92 行，带注释），以及
 `src/test/resources/` 下的 calculator / json / lexMode / sql 文法与样例。
 
+面向其他项目的 yccc 语法参考（如何编写 `.grammar` 文法文件）见
+[`docs/yccc-syntax.md`](docs/yccc-syntax.md)。
+
 ## 与原版的差异（除语言平台外，仅以下几处）
 
 1. **`TextPosition.back()` 补上 throw**：原 C# 代码构造了
