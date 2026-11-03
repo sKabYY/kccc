@@ -1,0 +1,378 @@
+((success? true)
+ (nodes
+  ((program[(1,1)-(92,13)]
+    (def-root[(1,1)-(5,1)] program)
+    (option-section[(5,1)-(13,1)]
+     (option-stm[(5,1)-(7,1)]
+      (include-builtin[(5,1)-(7,1)]))
+     (option-stm[(7,1)-(8,1)]
+      (case-sensitive[(7,1)-(7,17)])
+      (on[(7,17)-(8,1)]))
+     (option-stm[(8,1)-(9,1)]
+      (split-word[(8,1)-(8,13)])
+      (on[(8,13)-(9,1)]))
+     (option-stm[(9,1)-(13,1)]
+      (lex-ignore[(9,1)-(9,13)])
+      (spacing-parser[(9,13)-(13,1)] spacing)))
+    (def-section[(13,1)-(92,13)]
+     (def-stm[(13,1)-(14,1)]
+      (lhs[(13,1)-(13,15)] comment-start)
+      (glob-char-exp[(13,17)-(13,20)]
+       (normal-char[(13,18)-(13,20)] #))
+      (glob-char-exp[(13,20)-(14,1)]
+       (normal-char[(13,21)-(14,1)] |)))
+     (def-stm[(14,1)-(15,1)]
+      (lhs[(14,1)-(14,13)] comment-end)
+      (glob-char-exp[(14,15)-(14,18)]
+       (normal-char[(14,16)-(14,18)] |))
+      (glob-char-exp[(14,18)-(15,1)]
+       (normal-char[(14,19)-(15,1)] #)))
+     (def-stm[(15,1)-(17,1)]
+      (lhs[(15,1)-(15,9)] comment)
+      (op-exp[(15,11)-(17,1)]
+       (op[(15,12)-(15,16)] @or)
+       (seq-exp[(15,16)-(16,16)]
+        (glob-char-exp[(15,17)-(15,20)]
+         (normal-char[(15,18)-(15,20)] ;))
+        (op-exp[(15,20)-(15,42)]
+         (op[(15,21)-(15,24)] @*)
+         (op-exp[(15,24)-(15,38)]
+          (op[(15,25)-(15,28)] @!)
+          (glob-char-exp[(15,28)-(15,36)]
+           (special-char[(15,29)-(15,36)] newline)))
+         (any-exp[(15,38)-(15,41)])))
+       (seq-exp[(16,16)-(16,69)]
+        (var-exp[(16,17)-(16,31)] comment-start)
+        (op-exp[(16,31)-(16,57)]
+         (op[(16,32)-(16,35)] @*)
+         (op-exp[(16,35)-(16,52)]
+          (op[(16,36)-(16,39)] @!)
+          (var-exp[(16,39)-(16,50)] comment-end))
+         (any-exp[(16,52)-(16,55)]))
+        (var-exp[(16,57)-(16,68)] comment-end))))
+     (def-stm[(17,1)-(19,1)]
+      (lhs[(17,1)-(17,9)] spacing)
+      (glob-exp[(17,11)-(19,1)]
+       (op-exp[(17,12)-(19,1)]
+        (op[(17,13)-(17,16)] @*)
+        (op-exp[(17,16)-(17,36)]
+         (op[(17,17)-(17,21)] @or)
+         (glob-char-exp[(17,21)-(17,28)]
+          (special-char[(17,22)-(17,28)] space))
+         (var-exp[(17,28)-(17,35)] comment)))))
+     (def-stm[(19,1)-(20,1)]
+      (lhs[(19,1)-(19,11)] var-start)
+      (op-exp[(19,13)-(20,1)]
+       (op[(19,14)-(19,18)] @or)
+       (char-exp[(19,18)-(19,22)]
+        (normal-char[(19,20)-(19,22)] _))
+       (char-exp[(19,22)-(19,26)]
+        (normal-char[(19,24)-(19,26)] -))
+       (var-exp[(19,26)-(19,31)] alpha)))
+     (def-stm[(20,1)-(22,1)]
+      (lhs[(20,1)-(20,10)] variable)
+      (err-exp[(20,12)-(20,69)]
+       (message[(20,17)-(20,31)] "invalid var")
+       (var-exp[(20,31)-(20,41)] var-start)
+       (op-exp[(20,41)-(20,67)]
+        (op[(20,42)-(20,45)] @*)
+        (op-exp[(20,45)-(20,66)]
+         (op[(20,46)-(20,50)] @or)
+         (var-exp[(20,50)-(20,60)] var-start)
+         (var-exp[(20,60)-(20,65)] digit))))
+      (var-exp[(20,69)-(22,1)] spacing))
+     (def-stm[(22,1)-(24,1)]
+      (lhs[(22,1)-(22,11)] char-iden)
+      (op-exp[(22,13)-(24,1)]
+       (op[(22,14)-(22,18)] @or)
+       (named-exp[(22,18)-(23,18)]
+        (name[(22,18)-(22,30)] special-char)
+        (op-exp[(22,31)-(23,18)]
+         (op[(22,32)-(22,36)] @or)
+         (word-exp[(22,36)-(22,43)] eof)
+         (word-exp[(22,43)-(22,54)] newline)
+         (word-exp[(22,54)-(22,62)] space)))
+       (named-exp[(23,18)-(23,77)]
+        (name[(23,18)-(23,29)] normal-char)
+        (seq-exp[(23,30)-(23,77)]
+         (err-exp[(23,31)-(23,65)]
+          (message[(23,36)-(23,52)] "expect a char")
+          (op-exp[(23,52)-(23,63)]
+           (op[(23,53)-(23,56)] @!)
+           (glob-char-exp[(23,56)-(23,62)]
+            (special-char[(23,57)-(23,62)] space))))
+         (any-exp[(23,65)-(23,69)])
+         (var-exp[(23,69)-(23,76)] spacing)))))
+     (def-stm[(24,1)-(25,1)]
+      (lhs[(24,1)-(24,7)] hchar)
+      (glob-char-exp[(24,9)-(24,12)]
+       (normal-char[(24,10)-(24,12)] #))
+      (glob-char-exp[(24,12)-(24,15)]
+       (normal-char[(24,13)-(24,15)] \))
+      (var-exp[(24,15)-(25,1)] char-iden))
+     (def-stm[(25,1)-(27,1)]
+      (lhs[(25,1)-(25,6)] char)
+      (glob-char-exp[(25,8)-(25,11)]
+       (normal-char[(25,9)-(25,11)] \))
+      (var-exp[(25,11)-(27,1)] char-iden))
+     (def-stm[(27,1)-(28,1)]
+      (lhs[(27,1)-(27,8)] string)
+      (glob-char-exp[(27,10)-(27,13)]
+       (normal-char[(27,11)-(27,13)] '))
+      (op-exp[(27,13)-(27,30)]
+       (op[(27,14)-(27,17)] @*)
+       (op-exp[(27,17)-(27,25)]
+        (op[(27,18)-(27,21)] @!)
+        (glob-char-exp[(27,21)-(27,23)]
+         (normal-char[(27,22)-(27,23)] ')))
+       (any-exp[(27,25)-(27,28)]))
+      (glob-char-exp[(27,30)-(27,33)]
+       (normal-char[(27,31)-(27,33)] '))
+      (var-exp[(27,33)-(28,1)] spacing))
+     (def-stm[(28,1)-(29,1)]
+      (lhs[(28,1)-(28,9)] hstring)
+      (glob-char-exp[(28,11)-(28,14)]
+       (normal-char[(28,12)-(28,14)] #))
+      (glob-char-exp[(28,14)-(28,17)]
+       (normal-char[(28,15)-(28,17)] '))
+      (op-exp[(28,17)-(28,34)]
+       (op[(28,18)-(28,21)] @*)
+       (op-exp[(28,21)-(28,29)]
+        (op[(28,22)-(28,25)] @!)
+        (glob-char-exp[(28,25)-(28,27)]
+         (normal-char[(28,26)-(28,27)] ')))
+       (any-exp[(28,29)-(28,32)]))
+      (glob-char-exp[(28,34)-(28,37)]
+       (normal-char[(28,35)-(28,37)] '))
+      (var-exp[(28,37)-(29,1)] spacing))
+     (def-stm[(29,1)-(33,1)]
+      (lhs[(29,1)-(29,9)] integer)
+      (op-exp[(29,11)-(29,22)]
+       (op[(29,12)-(29,15)] @+)
+       (var-exp[(29,15)-(29,20)] digit))
+      (var-exp[(29,22)-(33,1)] spacing))
+     (def-stm[(33,1)-(39,1)]
+      (lhs[(33,1)-(33,9)] program)
+      (named-exp[(33,11)-(39,1)]
+       (name[(33,11)-(33,18)] program)
+       (seq-exp[(33,19)-(39,1)]
+        (named-exp[(33,20)-(34,20)]
+         (name[(33,20)-(33,28)] def-root)
+         (var-exp[(33,29)-(34,20)] def-root))
+        (named-exp[(34,20)-(35,8)]
+         (name[(34,20)-(34,34)] option-section)
+         (op-exp[(34,35)-(35,8)]
+          (op[(34,36)-(34,39)] @*)
+          (named-exp[(34,39)-(34,60)]
+           (name[(34,39)-(34,49)] option-stm)
+           (var-exp[(34,50)-(34,60)] option-stm))))
+        (named-exp[(35,8)-(35,40)]
+         (name[(35,8)-(35,19)] def-section)
+         (op-exp[(35,20)-(35,40)]
+          (op[(35,21)-(35,24)] @*)
+          (named-exp[(35,24)-(35,39)]
+           (name[(35,24)-(35,31)] def-stm)
+           (var-exp[(35,32)-(35,39)] def-stm)))))))
+     (def-stm[(39,1)-(43,1)]
+      (lhs[(39,1)-(39,10)] def-root)
+      (glob-word-exp[(39,12)-(39,17)] ::)
+      (var-exp[(39,17)-(43,1)] variable))
+     (def-stm[(43,1)-(44,1)]
+      (lhs[(43,1)-(43,11)] on-or-off)
+      (op-exp[(43,13)-(44,1)]
+       (op[(43,14)-(43,18)] @or)
+       (named-exp[(43,18)-(43,26)]
+        (name[(43,18)-(43,20)] on)
+        (glob-word-exp[(43,21)-(43,26)] on))
+       (named-exp[(43,26)-(43,35)]
+        (name[(43,26)-(43,29)] off)
+        (glob-word-exp[(43,30)-(43,35)] off))))
+     (def-stm[(44,1)-(54,1)]
+      (lhs[(44,1)-(44,12)] option-stm)
+      (op-exp[(44,14)-(54,1)]
+       (op[(44,15)-(44,19)] @or)
+       (seq-exp[(44,19)-(45,19)]
+        (named-exp[(44,20)-(44,53)]
+         (name[(44,20)-(44,34)] case-sensitive)
+         (glob-word-exp[(44,35)-(44,53)] @case-sensitive))
+        (var-exp[(44,53)-(44,62)] on-or-off))
+       (seq-exp[(45,19)-(46,7)]
+        (named-exp[(45,20)-(45,45)]
+         (name[(45,20)-(45,30)] split-word)
+         (glob-word-exp[(45,31)-(45,45)] @split-word))
+        (var-exp[(45,45)-(45,54)] on-or-off))
+       (seq-exp[(46,7)-(47,7)]
+        (named-exp[(46,8)-(46,33)]
+         (name[(46,8)-(46,18)] lex-ignore)
+         (glob-word-exp[(46,19)-(46,33)] @lex-ignore))
+        (named-exp[(46,33)-(46,56)]
+         (name[(46,33)-(46,47)] spacing-parser)
+         (var-exp[(46,48)-(46,56)] variable)))
+       (seq-exp[(47,7)-(48,7)]
+        (named-exp[(47,8)-(47,28)]
+         (name[(47,8)-(47,16)] lex-mode)
+         (glob-word-exp[(47,17)-(47,28)] @lex-mode)))
+       (seq-exp[(48,7)-(49,7)]
+        (named-exp[(48,8)-(48,42)]
+         (name[(48,8)-(48,23)] include-builtin)
+         (glob-word-exp[(48,24)-(48,42)] @include-builtin)))
+       (seq-exp[(49,7)-(50,7)]
+        (named-exp[(49,8)-(49,61)]
+         (name[(49,8)-(49,32)] set-message-locale-start)
+         (glob-word-exp[(49,33)-(49,61)] @set-message-locale-start))
+        (named-exp[(49,61)-(49,80)]
+         (name[(49,61)-(49,73)] locale-start)
+         (var-exp[(49,74)-(49,80)] string)))
+       (seq-exp[(50,7)-(50,77)]
+        (named-exp[(50,8)-(50,59)]
+         (name[(50,8)-(50,32)] set-message-locale-start)
+         (glob-word-exp[(50,33)-(50,59)] @set-message-locale-end))
+        (named-exp[(50,59)-(50,76)]
+         (name[(50,59)-(50,69)] locale-end)
+         (var-exp[(50,70)-(50,76)] string)))))
+     (def-stm[(54,1)-(56,1)]
+      (lhs[(54,1)-(54,9)] def-stm)
+      (named-exp[(54,11)-(54,24)]
+       (name[(54,11)-(54,14)] lhs)
+       (var-exp[(54,15)-(54,24)] variable))
+      (glob-word-exp[(54,24)-(54,28)] =)
+      (op-exp[(54,28)-(56,1)]
+       (op[(54,29)-(54,32)] @+)
+       (var-exp[(54,32)-(54,36)] exp)
+       (op-exp[(54,36)-(54,44)]
+        (op[(54,37)-(54,40)] @!)
+        (glob-word-exp[(54,40)-(54,43)] =))))
+     (def-stm[(56,1)-(71,1)]
+      (lhs[(56,1)-(56,5)] exp)
+      (op-exp[(56,7)-(71,1)]
+       (op[(56,8)-(56,12)] @or)
+       (named-exp[(56,12)-(57,12)]
+        (name[(56,12)-(56,21)] named-exp)
+        (var-exp[(56,22)-(57,12)] named-exp))
+       (named-exp[(57,12)-(58,6)]
+        (name[(57,12)-(57,20)] glob-exp)
+        (var-exp[(57,21)-(58,6)] glob-exp))
+       (named-exp[(58,6)-(59,6)]
+        (name[(58,6)-(58,12)] op-exp)
+        (var-exp[(58,13)-(59,6)] op-exp))
+       (named-exp[(59,6)-(60,6)]
+        (name[(59,6)-(59,13)] err-exp)
+        (var-exp[(59,14)-(60,6)] err-exp))
+       (named-exp[(60,6)-(61,6)]
+        (name[(60,6)-(60,13)] seq-exp)
+        (var-exp[(60,14)-(61,6)] seq-exp))
+       (named-exp[(61,6)-(62,6)]
+        (name[(61,6)-(61,13)] any-exp)
+        (var-exp[(61,14)-(62,6)] any-exp))
+       (named-exp[(62,6)-(63,6)]
+        (name[(62,6)-(62,15)] array-exp)
+        (var-exp[(62,16)-(63,6)] array-exp))
+       (named-exp[(63,6)-(64,6)]
+        (name[(63,6)-(63,13)] dbg-exp)
+        (var-exp[(63,14)-(64,6)] dbg-exp))
+       (named-exp[(64,6)-(65,6)]
+        (name[(64,6)-(64,14)] dbg-1exp)
+        (var-exp[(64,15)-(65,6)] dbg-1exp))
+       (named-exp[(65,6)-(66,6)]
+        (name[(65,6)-(65,14)] char-exp)
+        (var-exp[(65,16)-(66,6)] hchar))
+       (named-exp[(66,6)-(67,6)]
+        (name[(66,6)-(66,19)] glob-char-exp)
+        (var-exp[(66,21)-(67,6)] char))
+       (named-exp[(67,6)-(68,6)]
+        (name[(67,6)-(67,14)] word-exp)
+        (var-exp[(67,15)-(68,6)] hstring))
+       (named-exp[(68,6)-(69,6)]
+        (name[(68,6)-(68,19)] glob-word-exp)
+        (var-exp[(68,20)-(69,6)] string))
+       (named-exp[(69,6)-(69,33)]
+        (name[(69,6)-(69,13)] var-exp)
+        (seq-exp[(69,14)-(69,33)]
+         (var-exp[(69,15)-(69,24)] variable)
+         (op-exp[(69,24)-(69,32)]
+          (op[(69,25)-(69,28)] @!)
+          (glob-word-exp[(69,28)-(69,31)] :))))))
+     (def-stm[(71,1)-(72,1)]
+      (lhs[(71,1)-(71,11)] named-exp)
+      (named-exp[(71,13)-(71,27)]
+       (name[(71,13)-(71,17)] name)
+       (var-exp[(71,18)-(71,27)] variable))
+      (glob-word-exp[(71,27)-(71,31)] :)
+      (var-exp[(71,31)-(72,1)] exp))
+     (def-stm[(72,1)-(73,1)]
+      (lhs[(72,1)-(72,10)] glob-exp)
+      (glob-word-exp[(72,12)-(72,16)] ~)
+      (var-exp[(72,16)-(73,1)] exp))
+     (def-stm[(73,1)-(74,1)]
+      (lhs[(73,1)-(73,8)] op-exp)
+      (var-exp[(73,10)-(73,17)] lparen)
+      (var-exp[(73,17)-(73,24)] cmb-op)
+      (op-exp[(73,24)-(73,33)]
+       (op[(73,25)-(73,28)] @*)
+       (var-exp[(73,28)-(73,31)] exp))
+      (var-exp[(73,33)-(74,1)] rparen))
+     (def-stm[(74,1)-(75,1)]
+      (lhs[(74,1)-(74,9)] err-exp)
+      (var-exp[(74,11)-(74,18)] lparen)
+      (glob-word-exp[(74,18)-(74,25)] @err)
+      (named-exp[(74,25)-(74,40)]
+       (name[(74,25)-(74,32)] message)
+       (var-exp[(74,33)-(74,40)] string))
+      (op-exp[(74,40)-(74,49)]
+       (op[(74,41)-(74,44)] @+)
+       (var-exp[(74,44)-(74,47)] exp))
+      (var-exp[(74,49)-(75,1)] rparen))
+     (def-stm[(75,1)-(76,1)]
+      (lhs[(75,1)-(75,9)] seq-exp)
+      (var-exp[(75,11)-(75,18)] lparen)
+      (op-exp[(75,18)-(75,27)]
+       (op[(75,19)-(75,22)] @+)
+       (var-exp[(75,22)-(75,25)] exp))
+      (var-exp[(75,27)-(76,1)] rparen))
+     (def-stm[(76,1)-(77,1)]
+      (lhs[(76,1)-(76,11)] array-exp)
+      (glob-word-exp[(76,13)-(76,17)] [)
+      (named-exp[(76,17)-(76,30)]
+       (name[(76,17)-(76,21)] size)
+       (var-exp[(76,22)-(76,30)] integer))
+      (glob-word-exp[(76,30)-(76,34)] ])
+      (var-exp[(76,34)-(77,1)] exp))
+     (def-stm[(77,1)-(78,1)]
+      (lhs[(77,1)-(77,9)] dbg-exp)
+      (glob-word-exp[(77,11)-(77,16)] ?[)
+      (op-exp[(77,16)-(77,25)]
+       (op[(77,17)-(77,20)] @+)
+       (var-exp[(77,20)-(77,23)] exp))
+      (glob-word-exp[(77,25)-(78,1)] ]))
+     (def-stm[(78,1)-(79,1)]
+      (lhs[(78,1)-(78,9)] any-exp)
+      (glob-word-exp[(78,11)-(79,1)] <*>))
+     (def-stm[(79,1)-(81,1)]
+      (lhs[(79,1)-(79,10)] dbg-1exp)
+      (glob-word-exp[(79,12)-(79,17)] ??)
+      (var-exp[(79,17)-(81,1)] exp))
+     (def-stm[(81,1)-(91,1)]
+      (lhs[(81,1)-(81,8)] cmb-op)
+      (err-exp[(81,10)-(91,1)]
+       (message[(81,15)-(81,28)] "unknown op")
+       (named-exp[(81,28)-(89,12)]
+        (name[(81,28)-(81,30)] op)
+        (op-exp[(81,31)-(89,12)]
+         (op[(81,32)-(82,15)] @or)
+         (word-exp[(82,15)-(83,6)] @+)
+         (word-exp[(83,6)-(84,6)] @*)
+         (word-exp[(84,6)-(85,6)] @,*)
+         (word-exp[(85,6)-(86,6)] @,+)
+         (word-exp[(86,6)-(87,6)] @or)
+         (word-exp[(87,6)-(88,6)] @..)
+         (word-exp[(88,6)-(89,6)] @!)
+         (word-exp[(89,6)-(89,11)] @?)))))
+     (def-stm[(91,1)-(92,1)]
+      (lhs[(91,1)-(91,8)] lparen)
+      (glob-word-exp[(91,10)-(92,1)] ())
+     (def-stm[(92,1)-(92,13)]
+      (lhs[(92,1)-(92,8)] rparen)
+      (glob-word-exp[(92,10)-(92,13)] )))))))
+ (rest <Stream: car=<EOF at=(92, 13)>>)
+ (message <null>)
+ (fail_rest <Stream: car=<EOF at=(92, 13)>>))

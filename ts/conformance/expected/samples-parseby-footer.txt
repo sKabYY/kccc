@@ -1,0 +1,7 @@
+((success? true)
+ (nodes
+  ((var[(1,1)-(1,4)] abc)
+   (var[(1,5)-(1,7)] ef)))
+ (rest <Stream: car=<EOF at=(1, 7)>>)
+ (message <null>)
+ (fail_rest <Stream: car=<EOF at=(1, 7)>>))

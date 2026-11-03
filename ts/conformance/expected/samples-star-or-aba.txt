@@ -1,0 +1,6 @@
+((success? true)
+ (nodes
+  ())
+ (rest <Stream: car=<EOF at=(1, 8)>>)
+ (message <null>)
+ (fail_rest <Stream: car=<EOF at=(1, 8)>>))

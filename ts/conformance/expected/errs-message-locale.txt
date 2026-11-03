@@ -1,0 +1,6 @@
+((success? false)
+ (message "盼望着 A 或 B")
+ (fail_rest <Stream: car=<Token char='C', from=(1, 1), to=(1, 2)>>)
+ (rest <Stream: car=<Token char='C', from=(1, 1), to=(1, 2)>>)
+ (nodes
+  ()))

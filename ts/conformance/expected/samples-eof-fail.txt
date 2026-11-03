@@ -1,0 +1,7 @@
+((success? false)
+ (message "expect EOF")
+ (fail_rest <Stream: car=<Token char='a', from=(1, 9), to=(1, 10)>>)
+ (rest <Stream: car=<Token char='a', from=(1, 9), to=(1, 10)>>)
+ (nodes
+  ((num[(1,1)-(1,5)] 1.1)
+   (num[(1,5)-(1,9)] 1.2))))

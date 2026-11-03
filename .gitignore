@@ -6,3 +6,7 @@ build/
 .tools/
 .tls-test/
 *.log
+
+# TypeScript package
+ts/node_modules/
+ts/dist/

@@ -1,0 +1,62 @@
+((success? true)
+ (nodes
+  ((program[(2,1)-(14,1)]
+    (def-root[(2,1)-(4,1)] sexps)
+    (option-section[(4,1)-(6,1)]
+     (option-stm[(4,1)-(6,1)]
+      (include-builtin[(4,1)-(6,1)])))
+    (def-section[(6,1)-(14,1)]
+     (def-stm[(6,1)-(7,1)]
+      (lhs[(6,1)-(6,7)] sexps)
+      (op-exp[(6,9)-(7,1)]
+       (op[(6,10)-(6,13)] @+)
+       (var-exp[(6,13)-(6,17)] sexp)))
+     (def-stm[(7,1)-(9,1)]
+      (lhs[(7,1)-(7,6)] sexp)
+      (op-exp[(7,8)-(9,1)]
+       (op[(7,9)-(7,13)] @or)
+       (named-exp[(7,13)-(7,34)]
+        (name[(7,13)-(7,14)] o)
+        (seq-exp[(7,15)-(7,34)]
+         (var-exp[(7,16)-(7,21)] open)
+         (var-exp[(7,21)-(7,27)] sexps)
+         (var-exp[(7,27)-(7,32)] close)))
+       (named-exp[(7,34)-(7,40)]
+        (name[(7,34)-(7,35)] i)
+        (var-exp[(7,36)-(7,40)] item))))
+     (def-stm[(9,1)-(10,1)]
+      (lhs[(9,1)-(9,6)] open)
+      (op-exp[(9,8)-(10,1)]
+       (op[(9,9)-(9,13)] @or)
+       (glob-word-exp[(9,13)-(9,17)] [)
+       (glob-word-exp[(9,17)-(9,20)] ()))
+     (def-stm[(10,1)-(11,1)]
+      (lhs[(10,1)-(10,7)] close)
+      (op-exp[(10,9)-(11,1)]
+       (op[(10,10)-(10,14)] @or)
+       (glob-word-exp[(10,14)-(10,18)] ])
+       (glob-word-exp[(10,18)-(10,21)] ))))
+     (def-stm[(11,1)-(13,1)]
+      (lhs[(11,1)-(11,6)] item)
+      (op-exp[(11,8)-(11,46)]
+       (op[(11,9)-(11,12)] @+)
+       (op-exp[(11,12)-(11,41)]
+        (op[(11,13)-(11,16)] @!)
+        (op-exp[(11,16)-(11,39)]
+         (op[(11,17)-(11,21)] @or)
+         (var-exp[(11,21)-(11,26)] open)
+         (var-exp[(11,26)-(11,32)] close)
+         (glob-char-exp[(11,32)-(11,38)]
+          (special-char[(11,33)-(11,38)] space))))
+       (any-exp[(11,41)-(11,44)]))
+      (var-exp[(11,46)-(13,1)] spacing))
+     (def-stm[(13,1)-(14,1)]
+      (lhs[(13,1)-(13,9)] spacing)
+      (glob-exp[(13,11)-(14,1)]
+       (op-exp[(13,12)-(14,1)]
+        (op[(13,13)-(13,16)] @*)
+        (glob-char-exp[(13,16)-(13,22)]
+         (special-char[(13,17)-(13,22)] space)))))))))
+ (rest <Stream: car=<EOF at=(14, 1)>>)
+ (message <null>)
+ (fail_rest <Stream: car=<EOF at=(14, 1)>>))

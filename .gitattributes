@@ -1,0 +1,5 @@
+# Conformance fixtures are compared byte-for-byte by the TypeScript test
+# harness, so they must survive a Windows checkout unchanged.
+ts/conformance/expected/*.txt text eol=lf
+ts/conformance/cases.ts text eol=lf
+ts/src/yccc-grammar.ts text eol=lf

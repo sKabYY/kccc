@@ -26,3 +26,18 @@ tasks.test {
         events("passed", "failed", "skipped")
     }
 }
+
+/**
+ * Regenerates the TypeScript conformance fixtures under `ts/`.
+ * See `ts/README.md`: the generated files are committed, so any behavior
+ * change on this side shows up as a diff in the TypeScript package too.
+ */
+tasks.register<JavaExec>("generateTsFixtures") {
+    group = "verification"
+    description = "Regenerate the TypeScript conformance fixtures under ts/"
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("io.github.skabyy.kccc.conformance.GenerateTsFixturesKt")
+    workingDir = projectDir
+    outputs.dir(layout.projectDirectory.dir("ts/conformance"))
+    outputs.file(layout.projectDirectory.file("ts/src/yccc-grammar.ts"))
+}

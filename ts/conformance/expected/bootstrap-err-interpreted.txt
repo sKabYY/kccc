@@ -1,0 +1,9 @@
+((success? false)
+ (message "expect EOF")
+ (fail_rest <Stream: car=<Token char='@', from=(1, 9), to=(1, 10)>>)
+ (rest <Stream: car=<Token char='@', from=(1, 9), to=(1, 10)>>)
+ (nodes
+  ((program[(1,1)-(1,9)]
+    (def-root[(1,1)-(1,9)] dummy)
+    (option-section[(1,9)-(1,9)])
+    (def-section[(1,9)-(1,9)])))))

@@ -1,0 +1,6 @@
+((success? false)
+ (message "哈哈 \"]\"")
+ (fail_rest <Stream: car=<EOF at=(1, 7)>>)
+ (rest <Stream: car=<Token char='[', from=(1, 1), to=(1, 2)>>)
+ (nodes
+  ()))

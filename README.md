@@ -113,6 +113,15 @@ calc("(5.1+2)*3+-2^3^2")   // → -490.7 = 7.1×3 − 2^(3^2)
   [`docs/yccc-syntax.md`](docs/yccc-syntax.md)。
 - yccc 最完整的语法范例：`src/main/resources/kccc/yccc.grammar`（自带注释，92 行）。
 
+## TypeScript / 前端
+
+`ts/` 下是语义 1:1 的 TypeScript 移植（零运行时依赖、ESM），可直接在浏览器或
+Node 中 `loadGrammar(...)`，产物与 JVM 版逐字符一致：
+
+- 用法与 API：[`ts/README.md`](ts/README.md)
+- 与 Kotlin 的对应关系、必须保持的语义、一致性测试机制：[`docs/ts-port.md`](docs/ts-port.md)
+- 改动语法或行为后重新生成 fixture：`gradlew generateTsFixtures`
+
 ## 项目结构
 
 ```

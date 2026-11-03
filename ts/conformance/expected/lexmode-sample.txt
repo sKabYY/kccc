@@ -1,0 +1,13 @@
+((success? true)
+ (nodes
+  ((persion[(1,1)-(1,10)]
+    (name[(1,1)-(1,6)] XMING)
+    (age[(1,6)-(1,9)] " 77")
+    (sex[(1,9)-(1,10)] M))
+   (persion[(2,1)-(2,10)]
+    (name[(2,1)-(2,6)] XHONG)
+    (age[(2,6)-(2,9)] 166)
+    (sex[(2,9)-(2,10)] F))))
+ (rest <Stream: car=<EOF at=(2, 10)>>)
+ (message <null>)
+ (fail_rest <Stream: car=<EOF at=(2, 10)>>))

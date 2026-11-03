@@ -1,0 +1,277 @@
+((success? true)
+ (nodes
+  ((create_table[(2,1)-(15,2)]
+    (table[(2,14)-(3,1)] MESSAGE_NOTIFY_TASK)
+    (table-items[(4,4)-(15,1)]
+     (column_definition[(4,4)-(4,54)]
+      P
+      K
+      _
+      I
+      D
+      (varchar2[(4,25)-(4,46)] 32)
+      (constraint[(4,46)-(4,54)]
+       (name[(4,46)-(4,46)])
+       (not_null[(4,46)-(4,54)])))
+     (column_definition[(5,4)-(5,54)]
+      O
+      B
+      J
+      E
+      C
+      T
+      _
+      I
+      D
+      (varchar2[(5,25)-(5,46)] 32)
+      (constraint[(5,46)-(5,54)]
+       (name[(5,46)-(5,46)])
+       (not_null[(5,46)-(5,54)])))
+     (column_definition[(6,4)-(6,54)]
+      M
+      S
+      G
+      _
+      T
+      Y
+      P
+      E
+      (varchar2[(6,25)-(6,46)] 32)
+      (constraint[(6,46)-(6,54)]
+       (name[(6,46)-(6,46)])
+       (not_null[(6,46)-(6,54)])))
+     (column_definition[(7,4)-(7,58)]
+      M
+      S
+      G
+      _
+      C
+      O
+      N
+      T
+      E
+      N
+      T
+      (varchar2[(7,25)-(7,46)] 1024)
+      (default[(7,54)-(7,58)]
+       (null[(7,54)-(7,58)])))
+     (column_definition[(8,4)-(8,54)]
+      P
+      L
+      A
+      N
+      _
+      S
+      E
+      N
+      D
+      _
+      T
+      I
+      M
+      E
+      (date[(8,25)-(8,46)])
+      (constraint[(8,46)-(8,54)]
+       (name[(8,46)-(8,46)])
+       (not_null[(8,46)-(8,54)])))
+     (constraint[(9,4)-(9,62)]
+      (name[(9,4)-(9,39)] PK_MESSAGE_NOTIFY_TASK1)
+      (primary_key[(9,39)-(9,62)] OBJECT_ID))
+     (constraint[(10,4)-(10,57)]
+      (name[(10,4)-(10,38)] PK_MESSAGE_NOTIFY_TASK)
+      (primary_key[(10,38)-(10,57)] HA_ID))
+     (constraint[(11,4)-(11,60)]
+      (name[(11,4)-(11,38)] PK_MESSAGE_NOTIFY_TASK)
+      (primary_key[(11,38)-(11,60)] MSG_TYPE))
+     (column_definition[(12,4)-(12,42)]
+      H
+      E
+      H
+      E
+      (varchar2[(12,9)-(12,22)] 32)
+      (constraint[(12,22)-(12,34)]
+       (name[(12,22)-(12,22)])
+       (primary_key[(12,22)-(12,34)]))
+      (constraint[(12,34)-(12,42)]
+       (name[(12,34)-(12,34)])
+       (not_null[(12,34)-(12,42)])))
+     (column_definition[(13,4)-(13,54)]
+      p
+      L
+      A
+      N
+      _
+      S
+      E
+      N
+      D
+      _
+      T
+      I
+      M
+      E
+      (date[(13,25)-(13,46)])
+      (constraint[(13,46)-(13,54)]
+       (name[(13,46)-(13,46)])
+       (not_null[(13,46)-(13,54)])))
+     (column_definition[(14,4)-(15,1)]
+      H
+      A
+      H
+      A
+      (varchar2[(14,9)-(14,22)] 32)
+      (constraint[(14,22)-(14,31)]
+       (name[(14,22)-(14,22)])
+       (not_null[(14,22)-(14,31)]))
+      (default[(14,39)-(15,1)]
+       (null[(14,39)-(15,1)])))))
+   (comment[(17,1)-(18,9)]
+    (table_comment[(17,12)-(17,38)]
+     (table[(17,18)-(17,38)] MESSAGE_NOTIFY_TASK))
+    消
+    息
+    通
+    知
+    任
+    务)
+   (comment[(20,1)-(21,5)]
+    (column_comment[(20,12)-(20,45)]
+     (table[(20,19)-(20,38)] MESSAGE_NOTIFY_TASK)
+     P
+     K
+     _
+     I
+     D)
+    主
+    键)
+   (comment[(23,1)-(24,9)]
+    (column_comment[(23,12)-(23,49)]
+     (table[(23,19)-(23,38)] MESSAGE_NOTIFY_TASK)
+     O
+     B
+     J
+     E
+     C
+     T
+     _
+     I
+     D)
+    关
+    联
+    对
+    象
+    I
+    d)
+   (comment[(26,1)-(27,7)]
+    (column_comment[(26,12)-(26,48)]
+     (table[(26,19)-(26,38)] MESSAGE_NOTIFY_TASK)
+     M
+     S
+     G
+     _
+     T
+     Y
+     P
+     E)
+    消
+    息
+    类
+    型)
+   (comment[(29,1)-(30,7)]
+    (column_comment[(29,12)-(29,51)]
+     (table[(29,19)-(29,38)] MESSAGE_NOTIFY_TASK)
+     M
+     S
+     G
+     _
+     C
+     O
+     N
+     T
+     E
+     N
+     T)
+    消
+    息
+    内
+    容)
+   (comment[(32,1)-(33,9)]
+    (column_comment[(32,12)-(32,54)]
+     (table[(32,19)-(32,38)] MESSAGE_NOTIFY_TASK)
+     P
+     L
+     A
+     N
+     _
+     S
+     E
+     N
+     D
+     _
+     T
+     I
+     M
+     E)
+    计
+    划
+    发
+    送
+    时
+    间)
+   (create_index[(35,1)-(38,2)]
+    (index_type[(35,8)-(35,15)]
+     (unique[(35,8)-(35,15)]))
+    (object[(35,21)-(35,45)] MESSAGE_NOTIFY_TASK_IDX)
+    (table_index_clause[(35,48)-(38,2)]
+     (table[(35,48)-(35,68)] MESSAGE_NOTIFY_TASK)
+     (t_alias[(35,68)-(35,68)])
+     (indexes[(36,4)-(38,1)]
+      (index[(36,4)-(36,17)]
+       (t_alias[(36,4)-(36,4)])
+       O
+       B
+       J
+       E
+       C
+       T
+       _
+       I
+       D
+       (asc[(36,14)-(36,17)]))
+      (index[(37,4)-(38,1)]
+       (t_alias[(37,4)-(37,4)])
+       M
+       S
+       G
+       _
+       T
+       Y
+       P
+       E
+       (asc[(37,13)-(38,1)])))))
+   (grant[(40,1)-(40,72)]
+    (privilege[(40,7)-(40,13)]
+     (select[(40,7)-(40,13)])
+     (columns[(40,13)-(40,13)]))
+    (privilege[(40,15)-(40,21)]
+     (update[(40,15)-(40,21)])
+     (columns[(40,21)-(40,21)]))
+    (privilege[(40,23)-(40,29)]
+     (insert[(40,23)-(40,29)])
+     (columns[(40,29)-(40,29)]))
+    (privilege[(40,31)-(40,38)]
+     (delete[(40,31)-(40,38)])
+     (columns[(40,38)-(40,38)]))
+    (object[(40,41)-(40,62)] MESSAGE_NOTIFY_TASK)
+    (grantee[(40,65)-(40,72)]
+     (role_or_user[(40,65)-(40,72)] dsp_app))
+    (hierarchy_option[(40,72)-(40,72)])
+    (grant_option[(40,72)-(40,72)]))
+   (create_synonym[(41,1)-(41,77)]
+    (replace_option[(41,8)-(41,8)])
+    (public_option[(41,8)-(41,8)])
+    (synonym[(41,16)-(41,45)] dsp_appMESSAGE_NOTIFY_TASK)
+    (object[(41,49)-(41,77)] dsp_admMESSAGE_NOTIFY_TASK))))
+ (rest <Stream: car=<EOF at=(42, 1)>>)
+ (message <null>)
+ (fail_rest <Stream: car=<EOF at=(42, 1)>>))
