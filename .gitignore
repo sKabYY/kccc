@@ -10,3 +10,6 @@ build/
 # TypeScript package
 ts/node_modules/
 ts/dist/
+
+# Gradle 发行包本体（手动下载用于填充 wrapper 缓存，不应进版本库）
+gradle-*-bin.zip
